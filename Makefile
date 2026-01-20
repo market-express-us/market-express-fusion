@@ -16,13 +16,14 @@
 #   make status   - Check service health
 #   make logs     - View container logs
 
-.PHONY: init update destroy status logs help clean backup
+.PHONY: init update destroy status logs help clean backup env-dev
 
 # Default target
 help:
 	@echo "FusionAuth Deployment Automation"
 	@echo ""
 	@echo "Available targets:"
+	@echo "  make env-dev  - Generate .env with secure random passwords"
 	@echo "  make init     - First-time deployment (creates .env, starts containers)"
 	@echo "  make update   - Deploy configuration changes (preserves data)"
 	@echo "  make destroy  - Tear down environment (optional data removal)"
@@ -32,10 +33,9 @@ help:
 	@echo "  make clean    - Remove stopped containers and orphaned volumes"
 	@echo ""
 	@echo "Quick start:"
-	@echo "  1. make init"
-	@echo "  2. Edit .env with actual credentials"
-	@echo "  3. make init (run again after editing .env)"
-	@echo "  4. Visit http://localhost:9011"
+	@echo "  1. make env-dev"
+	@echo "  2. make init"
+	@echo "  3. Visit http://localhost:9011"
 
 # First-time deployment
 init:
@@ -222,3 +222,7 @@ clean:
 	@echo ""
 	@echo "Cleanup complete"
 	@echo ""
+
+# Generate .env file with secure random passwords
+env-dev:
+	@./scripts/generate-env.sh
