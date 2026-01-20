@@ -74,12 +74,14 @@ fi
 echo "Generating secure random passwords..."
 
 # Generate passwords (set +e to ignore SIGPIPE from tr/head pipe)
+# Using alphanumeric-only to avoid sed escaping issues with special characters
+# 64 alphanumeric chars = ~380 bits entropy (cryptographically secure)
 set +e
-DB_PASSWORD=$(generate_password 32)
-API_KEY=$(generate_password 64)
-ADMIN_CLIENT_SECRET=$(generate_password 64)
-VENDOR_CLIENT_SECRET=$(generate_password 64)
-STORE_CLIENT_SECRET=$(generate_password 64)
+DB_PASSWORD=$(generate_alphanumeric 32)
+API_KEY=$(generate_alphanumeric 64)
+ADMIN_CLIENT_SECRET=$(generate_alphanumeric 64)
+VENDOR_CLIENT_SECRET=$(generate_alphanumeric 64)
+STORE_CLIENT_SECRET=$(generate_alphanumeric 64)
 set -e
 
 # Copy template to .env
