@@ -5,7 +5,8 @@
     "vendorApplicationId": "0cc89d65-44e8-4662-940a-8e26c08b7a5e",
     "storeApplicationId": "7c3a8d37-0e74-4a40-bc9e-df1d1d3f3456",
     "fusionAuthBaseURL": "http://localhost:9011",
-    "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c"
+    "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
+    "adminUserId": "00000000-0000-0000-0000-000000000001"
   },
   "apiKeys": [
     {
@@ -231,6 +232,28 @@
             }
           ]
         }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{adminUserId}",
+      "body": {
+        "user": {
+          "id": "#{adminUserId}",
+          "email": "#{FUSIONAUTH_ADMIN_EMAIL}",
+          "password": "#{FUSIONAUTH_ADMIN_PASSWORD}",
+          "firstName": "Platform",
+          "lastName": "Administrator",
+          "tenantId": "#{defaultTenantId}",
+          "active": true,
+          "verified": true
+        },
+        "registration": {
+          "applicationId": "#{adminApplicationId}",
+          "roles": ["platform-admin"]
+        },
+        "sendSetPasswordEmail": false,
+        "skipVerification": true
       }
     }
   ]
