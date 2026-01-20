@@ -96,7 +96,6 @@ services:
 
     networks:
       - db_net
-      - market-express-proxy
 
     labels:
       # Traefik reverse proxy configuration for production deployment
@@ -119,9 +118,6 @@ networks:
   db_net:
     driver: bridge
     name: fusionauth-network
-
-  market-express-proxy:
-    external: true
 
 # Volumes
 volumes:
