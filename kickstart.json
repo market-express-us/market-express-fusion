@@ -5,14 +5,13 @@
     "vendorApplicationId": "0cc89d65-44e8-4662-940a-8e26c08b7a5e",
     "storeApplicationId": "7c3a8d37-0e74-4a40-bc9e-df1d1d3f3456",
     "fusionAuthBaseURL": "http://localhost:9011",
-    "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
-    "apiKey": "fa-dev-key-8f3e9d2c1a4b7e6f5d8c9a2b1e4d7c6f5a8b9e2d1c4a7b6e5f8d9c2a1e4b7c6f5a"
+    "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c"
   },
   "apiKeys": [
     {
       "id": "#{apiKeyId}",
-      "key": "#{apiKey}",
-      "description": "Development API key for MercurJS integration",
+      "key": "#{FUSIONAUTH_API_KEY}",
+      "description": "MercurJS integration API key (from environment)",
       "permissions": {
         "endpoints": {
           "/api/application": ["GET", "POST", "PUT", "PATCH", "DELETE"],
@@ -68,7 +67,7 @@
               "http://localhost:9000/admin/auth/fusionauth/callback"
             ],
             "clientId": "#{adminApplicationId}",
-            "clientSecret": "admin-secret-4f8a9b2c1d3e5a7f6b8c9d1e2a4b6c8d9e1f2a3b5c7d8e9f1a2b4c6d7e9f1a2b",
+            "clientSecret": "#{ADMIN_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": [
               "authorization_code",
@@ -132,7 +131,7 @@
               "http://localhost:9000/vendor/auth/fusionauth/callback"
             ],
             "clientId": "#{vendorApplicationId}",
-            "clientSecret": "vendor-secret-7c2e4a6b8d9f1a3c5e7b9d1f2a4c6e8b9d1a3c5f7e9b1a3d5c7e9f1a3b5d7e9f",
+            "clientSecret": "#{VENDOR_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": [
               "authorization_code",
@@ -196,7 +195,7 @@
               "http://localhost:9000/store/auth/fusionauth/callback"
             ],
             "clientId": "#{storeApplicationId}",
-            "clientSecret": "store-secret-9e1a3c5f7b9d1a3e5c7f9b1d3a5e7c9f1b3d5a7e9c1f3a5b7d9e1c3f5a7b9d1e",
+            "clientSecret": "#{STORE_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": [
               "authorization_code",
