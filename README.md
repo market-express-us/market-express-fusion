@@ -54,17 +54,26 @@ This project deploys FusionAuth 1.53.2 identity provider with PostgreSQL 17.2 da
 # Clone or navigate to project directory
 cd /path/to/market-express-fusion
 
+# Generate .env with cryptographically secure random passwords
+make env-dev
+
+# Review generated .env (optional - adjust non-password settings if needed)
+cat .env
+
 # Run initial deployment
 make init
-
-# Edit .env file with actual credentials (make init will prompt)
-nano .env
-# or
-vim .env
-
-# Run deployment again after editing credentials
-make init
 ```
+
+**What `make env-dev` does:**
+- Copies `.env.template` to `.env`
+- Generates 5 cryptographically secure random passwords using `/dev/urandom`
+  - `DATABASE_PASSWORD` (32 characters) - PostgreSQL authentication
+  - `FUSIONAUTH_API_KEY` (64 characters) - MercurJS integration API key
+  - `ADMIN_CLIENT_SECRET` (64 characters) - Admin application OAuth2 secret
+  - `VENDOR_CLIENT_SECRET` (64 characters) - Vendor application OAuth2 secret
+  - `STORE_CLIENT_SECRET` (64 characters) - Store application OAuth2 secret
+- Backs up existing `.env` before overwriting (with timestamp)
+- Creates unique credentials for each deployment
 
 **Expected output:**
 ```
