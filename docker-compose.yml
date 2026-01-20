@@ -90,6 +90,16 @@ services:
 
     networks:
       - db_net
+      - market-express-proxy
+
+    labels:
+      # Traefik reverse proxy configuration for production deployment
+      - "traefik.enable=true"
+      - "traefik.http.routers.fusionauth.rule=Host(`auth.marketexpress.us`)"
+      - "traefik.http.routers.fusionauth.entrypoints=websecure"
+      - "traefik.http.routers.fusionauth.tls=true"
+      - "traefik.http.services.fusionauth.loadbalancer.server.port=9011"
+      - "traefik.docker.network=market-express-proxy"
 
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9011/api/status || exit 1"]
@@ -103,6 +113,9 @@ networks:
   db_net:
     driver: bridge
     name: fusionauth-network
+
+  market-express-proxy:
+    external: true
 
 # Volumes
 volumes:
