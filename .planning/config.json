@@ -1,0 +1,11 @@
+{
+  "workflow": {
+    "mode": "yolo",
+    "depth": "quick",
+    "parallelization": false
+  },
+  "planning": {
+    "commit_docs": false,
+    "search_gitignored": false
+  }
+}
