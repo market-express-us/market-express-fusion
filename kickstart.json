@@ -1,0 +1,238 @@
+{
+  "variables": {
+    "defaultTenantId": "d7d09513-a3f5-401c-9685-34ab6c552453",
+    "adminApplicationId": "3c219e58-ed0e-4b18-ad48-f4f92793ae32",
+    "vendorApplicationId": "0cc89d65-44e8-4662-940a-8e26c08b7a5e",
+    "storeApplicationId": "7c3a8d37-0e74-4a40-bc9e-df1d1d3f3456",
+    "fusionAuthBaseURL": "http://localhost:9011",
+    "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
+    "apiKey": "fa-dev-key-8f3e9d2c1a4b7e6f5d8c9a2b1e4d7c6f5a8b9e2d1c4a7b6e5f8d9c2a1e4b7c6f5a"
+  },
+  "apiKeys": [
+    {
+      "id": "#{apiKeyId}",
+      "key": "#{apiKey}",
+      "description": "Development API key for MercurJS integration",
+      "permissions": {
+        "endpoints": {
+          "/api/application": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          "/api/user": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          "/api/user/registration": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          "/api/group": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          "/api/group/member": ["GET", "POST", "PUT", "DELETE"]
+        }
+      }
+    }
+  ],
+  "requests": [
+    {
+      "method": "PATCH",
+      "url": "/api/tenant/#{defaultTenantId}",
+      "body": {
+        "tenant": {
+          "name": "Market Express",
+          "issuer": "marketexpress.us",
+          "jwtConfiguration": {
+            "accessTokenKeyId": "#{FUSIONAUTH_TENANT_ACCESS_TOKEN_SIGNING_KEY}",
+            "idTokenKeyId": "#{FUSIONAUTH_TENANT_ID_TOKEN_SIGNING_KEY}",
+            "timeToLiveInSeconds": 28800,
+            "refreshTokenTimeToLiveInMinutes": 43200
+          },
+          "passwordValidationRules": {
+            "minLength": 8,
+            "requireMixedCase": false,
+            "requireNonAlpha": false,
+            "requireNumber": false,
+            "validateOnLogin": true
+          },
+          "failedAuthenticationConfiguration": {
+            "tooManyAttempts": 5,
+            "actionDuration": 300,
+            "actionDurationUnit": "SECONDS",
+            "resetCountInSeconds": 3600
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{adminApplicationId}",
+      "tenantId": "#{defaultTenantId}",
+      "body": {
+        "application": {
+          "name": "marketexpress-admin",
+          "tenantId": "#{defaultTenantId}",
+          "oauthConfiguration": {
+            "authorizedRedirectURLs": [
+              "http://localhost:9000/auth/fusionauth/callback",
+              "http://localhost:9000/admin/auth/fusionauth/callback"
+            ],
+            "clientId": "#{adminApplicationId}",
+            "clientSecret": "admin-secret-4f8a9b2c1d3e5a7f6b8c9d1e2a4b6c8d9e1f2a3b5c7d8e9f1a2b4c6d7e9f1a2b",
+            "clientAuthenticationPolicy": "Required",
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "logoutURL": "http://localhost:9000/admin/logout",
+            "requireRegistration": true,
+            "scopeHandlingPolicy": "Strict"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "timeToLiveInSeconds": 28800,
+            "refreshTokenTimeToLiveInMinutes": 43200
+          },
+          "loginConfiguration": {
+            "requireAuthentication": true,
+            "allowTokenRefresh": true
+          },
+          "multiFactorConfiguration": {
+            "loginPolicy": "Required",
+            "email": {
+              "templateId": "#{FUSIONAUTH_DEFAULT_EMAIL_TEMPLATE}"
+            },
+            "sms": {
+              "templateId": "#{FUSIONAUTH_DEFAULT_SMS_TEMPLATE}"
+            }
+          },
+          "registrationConfiguration": {
+            "enabled": true,
+            "type": "basic"
+          },
+          "roles": [
+            {
+              "name": "platform-admin",
+              "description": "Full platform management capabilities including system configuration, user management, and vendor oversight",
+              "isDefault": false,
+              "isSuperRole": false
+            },
+            {
+              "name": "platform-support",
+              "description": "Read-only access with limited user management for customer support operations",
+              "isDefault": false,
+              "isSuperRole": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{vendorApplicationId}",
+      "tenantId": "#{defaultTenantId}",
+      "body": {
+        "application": {
+          "name": "marketexpress-vendor",
+          "tenantId": "#{defaultTenantId}",
+          "oauthConfiguration": {
+            "authorizedRedirectURLs": [
+              "http://localhost:9000/auth/fusionauth/callback",
+              "http://localhost:9000/vendor/auth/fusionauth/callback"
+            ],
+            "clientId": "#{vendorApplicationId}",
+            "clientSecret": "vendor-secret-7c2e4a6b8d9f1a3c5e7b9d1f2a4c6e8b9d1a3c5f7e9b1a3d5c7e9f1a3b5d7e9f",
+            "clientAuthenticationPolicy": "Required",
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "logoutURL": "http://localhost:9000/vendor/logout",
+            "requireRegistration": true,
+            "scopeHandlingPolicy": "Strict"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "timeToLiveInSeconds": 28800,
+            "refreshTokenTimeToLiveInMinutes": 43200
+          },
+          "loginConfiguration": {
+            "requireAuthentication": true,
+            "allowTokenRefresh": true
+          },
+          "multiFactorConfiguration": {
+            "loginPolicy": "Disabled"
+          },
+          "registrationConfiguration": {
+            "enabled": true,
+            "type": "basic"
+          },
+          "roles": [
+            {
+              "name": "vendor-owner",
+              "description": "Full seller account control including financial settings, team management, and storefront configuration",
+              "isDefault": false,
+              "isSuperRole": false
+            },
+            {
+              "name": "vendor-manager",
+              "description": "Product, inventory, order, and team member management without financial or ownership controls",
+              "isDefault": false,
+              "isSuperRole": false
+            },
+            {
+              "name": "vendor-staff",
+              "description": "Order fulfillment and customer communication only, no product or team management",
+              "isDefault": false,
+              "isSuperRole": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{storeApplicationId}",
+      "tenantId": "#{defaultTenantId}",
+      "body": {
+        "application": {
+          "name": "marketexpress-store",
+          "tenantId": "#{defaultTenantId}",
+          "oauthConfiguration": {
+            "authorizedRedirectURLs": [
+              "http://localhost:9000/auth/fusionauth/callback",
+              "http://localhost:9000/store/auth/fusionauth/callback"
+            ],
+            "clientId": "#{storeApplicationId}",
+            "clientSecret": "store-secret-9e1a3c5f7b9d1a3e5c7f9b1d3a5e7c9f1b3d5a7e9c1f3a5b7d9e1c3f5a7b9d1e",
+            "clientAuthenticationPolicy": "Required",
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "logoutURL": "http://localhost:9000/store/logout",
+            "requireRegistration": true,
+            "scopeHandlingPolicy": "Strict"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "timeToLiveInSeconds": 28800,
+            "refreshTokenTimeToLiveInMinutes": 43200
+          },
+          "loginConfiguration": {
+            "requireAuthentication": true,
+            "allowTokenRefresh": true
+          },
+          "multiFactorConfiguration": {
+            "loginPolicy": "Disabled"
+          },
+          "registrationConfiguration": {
+            "enabled": true,
+            "type": "basic"
+          },
+          "roles": [
+            {
+              "name": "customer",
+              "description": "Standard customer capabilities including browsing, purchasing, order tracking, and account management",
+              "isDefault": true,
+              "isSuperRole": false
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
