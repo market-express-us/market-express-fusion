@@ -74,6 +74,12 @@ services:
       # Kickstart configuration (INIT-03)
       FUSIONAUTH_APP_KICKSTART_FILE: ${FUSIONAUTH_APP_KICKSTART_FILE}
 
+      # Application secrets for Kickstart variable interpolation (SEC-02)
+      FUSIONAUTH_API_KEY: ${FUSIONAUTH_API_KEY}
+      ADMIN_CLIENT_SECRET: ${ADMIN_CLIENT_SECRET}
+      VENDOR_CLIENT_SECRET: ${VENDOR_CLIENT_SECRET}
+      STORE_CLIENT_SECRET: ${STORE_CLIENT_SECRET}
+
       # Memory configuration
       FUSIONAUTH_APP_MEMORY: 512M
 
