@@ -37,13 +37,14 @@ generate_password() {
   local length=${1:-32}
   # Use /dev/urandom for cryptographically secure random data
   # LC_ALL=C ensures proper character handling
-  LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*()-_=+' < /dev/urandom | head -c "$length"
+  # 2>/dev/null suppresses SIGPIPE error when head closes pipe early
+  LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*()-_=+' < /dev/urandom 2>/dev/null | head -c "$length"
 }
 
 # Function to generate alphanumeric password (for database names, usernames)
 generate_alphanumeric() {
   local length=${1:-16}
-  LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c "$length"
+  LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom 2>/dev/null | head -c "$length"
 }
 
 echo -e "${GREEN}FusionAuth Environment Generator${NC}"
@@ -72,9 +73,11 @@ fi
 
 echo "Generating secure random passwords..."
 
-# Generate passwords
+# Generate passwords (set +e to ignore SIGPIPE from tr/head pipe)
+set +e
 DB_PASSWORD=$(generate_password 32)
 FUSIONAUTH_PASSWORD=$(generate_password 32)
+set -e
 
 # Copy template to .env
 cp "$ENV_TEMPLATE" "$ENV_FILE"
