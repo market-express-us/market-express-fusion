@@ -1,0 +1,112 @@
+# FusionAuth Deployment - Docker Compose Configuration
+#
+# This configuration deploys FusionAuth authentication infrastructure with PostgreSQL
+# for the marketexpress.us B2B marketplace platform.
+#
+# Architecture:
+# - PostgreSQL 17: Authentication database with named volume persistence
+# - FusionAuth 1.53: Identity provider with OIDC/OAuth2 support
+# - Bridge network: Isolates inter-container communication
+#
+# Usage:
+#   cp .env.template .env
+#   # Edit .env with actual credentials
+#   docker-compose up -d
+#
+# Requirements: Docker Engine 29.1+ with Compose 2.39+
+
+services:
+  # PostgreSQL 17 - Authentication Database
+  db:
+    image: postgres:17.2
+    container_name: fusionauth-db
+    restart: unless-stopped
+
+    environment:
+      # Database configuration from .env file
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+      # Performance tuning for authentication workload
+      POSTGRES_MAX_CONNECTIONS: 200
+      POSTGRES_SHARED_BUFFERS: 256MB
+
+    volumes:
+      # CRITICAL: Named volume for data persistence (INIT-02)
+      # Data survives container recreation - DO NOT change to anonymous volume
+      - db_data:/var/lib/postgresql/data
+
+    networks:
+      - db_net
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    # Security: No port exposure - PostgreSQL only accessible via Docker network
+
+  # FusionAuth 1.53 - Identity Provider
+  fusionauth:
+    image: fusionauth/fusionauth-app:1.53.2
+    container_name: fusionauth-app
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      # Database connection
+      DATABASE_URL: jdbc:postgresql://db:${DATABASE_PORT}/${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_ROOT_USERNAME: ${DATABASE_USER}
+      DATABASE_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+
+      # FusionAuth runtime configuration (UPDT-02)
+      FUSIONAUTH_APP_RUNTIME_MODE: ${FUSIONAUTH_RUNTIME_MODE}
+      FUSIONAUTH_APP_SILENT_MODE: ${FUSIONAUTH_SILENT_MODE}
+
+      # Kickstart configuration (INIT-03)
+      FUSIONAUTH_APP_KICKSTART_FILE: ${FUSIONAUTH_APP_KICKSTART_FILE}
+
+      # Memory configuration
+      FUSIONAUTH_APP_MEMORY: 512M
+
+      # Search configuration (PostgreSQL-only mode, no Elasticsearch)
+      FUSIONAUTH_APP_SEARCH_TYPE: database
+
+    ports:
+      # FusionAuth admin UI and API
+      - "9011:9011"
+
+    volumes:
+      # Kickstart configuration (read-only mount)
+      - ./kickstart.json:/usr/local/fusionauth/kickstart/kickstart.json:ro
+
+    networks:
+      - db_net
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9011/api/status || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+# Networks
+networks:
+  db_net:
+    driver: bridge
+    name: fusionauth-network
+
+# Volumes
+volumes:
+  # Named volume for PostgreSQL data persistence (INIT-02)
+  # CRITICAL: This volume preserves user data across container recreations
+  db_data:
+    name: fusionauth-db-data
