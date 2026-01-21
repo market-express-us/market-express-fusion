@@ -58,7 +58,7 @@ DATABASE_PORT=5432
 # FusionAuth Runtime Configuration
 FUSIONAUTH_RUNTIME_MODE=production
 FUSIONAUTH_SILENT_MODE=true
-FUSIONAUTH_APP_KICKSTART_FILE=/usr/local/fusionauth/kickstart/kickstart.json
+FUSIONAUTH_APP_KICKSTART_FILE=/usr/local/fusionauth/kickstart/kickstart-dev.json
 
 # FusionAuth Application Secrets
 FUSIONAUTH_API_KEY=${FUSIONAUTH_API_KEY}
@@ -77,6 +77,11 @@ FUSIONAUTH_PUBLIC_URL=https://auth-dev.marketexpress.us
 EOF
 
 echo "✓ Created .env from GitHub Secrets"
+
+# Generate kickstart-dev.json with dev environment values
+echo "Generating kickstart-dev.json..."
+bash scripts/generate-kickstart-dev.sh
+echo "✓ Generated kickstart-dev.json"
 
 # Copy VPS override file to docker-compose.override.yml
 cp docker-compose.override.yml.dev docker-compose.override.yml

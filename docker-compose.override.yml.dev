@@ -10,6 +10,10 @@
 
 services:
   fusionauth:
+    volumes:
+      # Mount dev-specific kickstart configuration
+      - ./kickstart-dev.json:/usr/local/fusionauth/kickstart/kickstart-dev.json:ro
+
     networks:
       - db_net
       - market-express-proxy  # External Traefik network

@@ -11,6 +11,11 @@
 # Environment-specific Docker Compose overrides (generated during deployment)
 docker-compose.override.yml
 
+# Environment-specific Kickstart files (generated during deployment)
+kickstart-dev.json
+kickstart-stage.json
+kickstart-prod.json
+
 # Docker volume data directories (if using local mounts)
 data/
 volumes/
