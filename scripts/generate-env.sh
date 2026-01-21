@@ -83,6 +83,7 @@ API_KEY=$(generate_alphanumeric 64)
 ADMIN_CLIENT_SECRET=$(generate_alphanumeric 64)
 VENDOR_CLIENT_SECRET=$(generate_alphanumeric 64)
 STORE_CLIENT_SECRET=$(generate_alphanumeric 64)
+EMPLOYEE_CLIENT_SECRET=$(generate_alphanumeric 64)
 set -e
 
 # Copy template to .env
@@ -98,6 +99,11 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' "s/^ADMIN_CLIENT_SECRET=.*/ADMIN_CLIENT_SECRET=${ADMIN_CLIENT_SECRET}/" "$ENV_FILE"
   sed -i '' "s/^VENDOR_CLIENT_SECRET=.*/VENDOR_CLIENT_SECRET=${VENDOR_CLIENT_SECRET}/" "$ENV_FILE"
   sed -i '' "s/^STORE_CLIENT_SECRET=.*/STORE_CLIENT_SECRET=${STORE_CLIENT_SECRET}/" "$ENV_FILE"
+  sed -i '' "s/^EMPLOYEE_CLIENT_SECRET=.*/EMPLOYEE_CLIENT_SECRET=${EMPLOYEE_CLIENT_SECRET}/" "$ENV_FILE"
+  # Set environment to sandbox
+  sed -i '' "s/^ENVIRONMENT=.*/ENVIRONMENT=sandbox/" "$ENV_FILE"
+  sed -i '' "s|^OAUTH_CALLBACK_BASE_URL=.*|OAUTH_CALLBACK_BASE_URL=http://localhost:9000|" "$ENV_FILE"
+  sed -i '' "s|^FUSIONAUTH_PUBLIC_URL=.*|FUSIONAUTH_PUBLIC_URL=http://localhost:9011|" "$ENV_FILE"
 else
   # Linux sed
   sed -i "s/^DATABASE_PASSWORD=.*/DATABASE_PASSWORD=${DB_PASSWORD}/" "$ENV_FILE"
@@ -106,6 +112,11 @@ else
   sed -i "s/^ADMIN_CLIENT_SECRET=.*/ADMIN_CLIENT_SECRET=${ADMIN_CLIENT_SECRET}/" "$ENV_FILE"
   sed -i "s/^VENDOR_CLIENT_SECRET=.*/VENDOR_CLIENT_SECRET=${VENDOR_CLIENT_SECRET}/" "$ENV_FILE"
   sed -i "s/^STORE_CLIENT_SECRET=.*/STORE_CLIENT_SECRET=${STORE_CLIENT_SECRET}/" "$ENV_FILE"
+  sed -i "s/^EMPLOYEE_CLIENT_SECRET=.*/EMPLOYEE_CLIENT_SECRET=${EMPLOYEE_CLIENT_SECRET}/" "$ENV_FILE"
+  # Set environment to sandbox
+  sed -i "s/^ENVIRONMENT=.*/ENVIRONMENT=sandbox/" "$ENV_FILE"
+  sed -i "s|^OAUTH_CALLBACK_BASE_URL=.*|OAUTH_CALLBACK_BASE_URL=http://localhost:9000|" "$ENV_FILE"
+  sed -i "s|^FUSIONAUTH_PUBLIC_URL=.*|FUSIONAUTH_PUBLIC_URL=http://localhost:9011|" "$ENV_FILE"
 fi
 
 echo ""
@@ -118,6 +129,7 @@ echo "  - FUSIONAUTH_API_KEY: <64 character random key>"
 echo "  - ADMIN_CLIENT_SECRET: <64 character random secret>"
 echo "  - VENDOR_CLIENT_SECRET: <64 character random secret>"
 echo "  - STORE_CLIENT_SECRET: <64 character random secret>"
+echo "  - EMPLOYEE_CLIENT_SECRET: <64 character random secret>"
 echo ""
 echo -e "${YELLOW}IMPORTANT:${NC}"
 echo "  1. .env file is gitignored and will NOT be committed"

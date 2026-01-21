@@ -79,10 +79,16 @@ services:
       ADMIN_CLIENT_SECRET: ${ADMIN_CLIENT_SECRET}
       VENDOR_CLIENT_SECRET: ${VENDOR_CLIENT_SECRET}
       STORE_CLIENT_SECRET: ${STORE_CLIENT_SECRET}
+      EMPLOYEE_CLIENT_SECRET: ${EMPLOYEE_CLIENT_SECRET}
 
       # Admin user credentials for Kickstart
       FUSIONAUTH_ADMIN_EMAIL: ${FUSIONAUTH_ADMIN_EMAIL}
       FUSIONAUTH_ADMIN_PASSWORD: ${FUSIONAUTH_ADMIN_PASSWORD}
+
+      # Environment-specific configuration
+      ENVIRONMENT: ${ENVIRONMENT}
+      OAUTH_CALLBACK_BASE_URL: ${OAUTH_CALLBACK_BASE_URL}
+      FUSIONAUTH_PUBLIC_URL: ${FUSIONAUTH_PUBLIC_URL}
 
       # Memory configuration
       FUSIONAUTH_APP_MEMORY: 512M
@@ -100,15 +106,6 @@ services:
 
     networks:
       - db_net
-
-    labels:
-      # Traefik reverse proxy configuration for production deployment
-      - "traefik.enable=true"
-      - "traefik.http.routers.fusionauth.rule=Host(`auth.marketexpress.us`)"
-      - "traefik.http.routers.fusionauth.entrypoints=websecure"
-      - "traefik.http.routers.fusionauth.tls=true"
-      - "traefik.http.services.fusionauth.loadbalancer.server.port=9011"
-      - "traefik.docker.network=market-express-proxy"
 
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9011/api/status || exit 1"]

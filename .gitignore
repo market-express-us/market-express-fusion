@@ -6,6 +6,10 @@
 .env.local
 .env.*.local
 *.env.local
+.env.backup.*
+
+# Environment-specific Docker Compose overrides (generated during deployment)
+docker-compose.override.yml
 
 # Docker volume data directories (if using local mounts)
 data/
@@ -19,6 +23,7 @@ search-data/
 *.backup
 *.old
 *.tmp
+backup*.sql
 
 # IDE files
 .idea/

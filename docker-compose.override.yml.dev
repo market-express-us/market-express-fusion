@@ -1,0 +1,32 @@
+# VPS Dev Environment Override
+#
+# This file is deployed to VPS as docker-compose.override.yml via CI/CD
+# Docker Compose automatically merges this with docker-compose.yml
+#
+# Author: Colin Bitterfield
+# Email: colin@bitterfield.com
+# Date Created: 2026-01-20
+# Version: 1.0.0
+
+services:
+  fusionauth:
+    networks:
+      - db_net
+      - market-express-proxy  # External Traefik network
+
+    labels:
+      # Traefik configuration for dev subdomain
+      - "traefik.enable=true"
+      - "traefik.http.routers.fusionauth-dev.rule=Host(`auth-dev.marketexpress.us`)"
+      - "traefik.http.routers.fusionauth-dev.entrypoints=websecure"
+      - "traefik.http.routers.fusionauth-dev.tls=true"
+      - "traefik.http.routers.fusionauth-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fusionauth-dev.loadbalancer.server.port=9011"
+      - "traefik.docker.network=market-express-proxy"
+
+    # Don't expose port 9011 to host (Traefik handles routing)
+    ports: []
+
+networks:
+  market-express-proxy:
+    external: true
