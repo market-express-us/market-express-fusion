@@ -88,20 +88,20 @@ cp docker-compose.override.yml.dev docker-compose.override.yml
 echo "✓ Configured VPS environment overrides"
 
 # Backup existing database (if running)
-if docker-compose ps | grep fusionauth-db | grep -q Up; then
+if docker compose ps | grep fusionauth-db | grep -q Up; then
   echo "Creating database backup..."
   BACKUP_FILE="backup-$(date +%Y%m%d-%H%M%S).sql"
-  docker-compose exec -T db pg_dump -U fusionauth fusionauth > "$BACKUP_FILE" || true
+  docker compose exec -T db pg_dump -U fusionauth fusionauth > "$BACKUP_FILE" || true
   echo "✓ Database backed up to $BACKUP_FILE"
 fi
 
 # Pull latest images
 echo "Pulling Docker images..."
-docker-compose pull
+docker compose pull
 
 # Deploy with zero-downtime restart
 echo "Deploying FusionAuth..."
-docker-compose up -d --force-recreate
+docker compose up -d --force-recreate
 
 # Wait for health checks
 echo "Waiting for FusionAuth to be healthy..."
@@ -112,7 +112,7 @@ for i in {1..30}; do
   fi
   if [ $i -eq 30 ]; then
     echo -e "${RED}ERROR: FusionAuth health check timeout${NC}"
-    docker-compose logs --tail=50 fusionauth
+    docker compose logs --tail=50 fusionauth
     exit 1
   fi
   echo "Waiting... ($i/30)"
