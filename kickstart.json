@@ -1,13 +1,33 @@
 {
   "variables": {
     "defaultTenantId": "d7d09513-a3f5-401c-9685-34ab6c552453",
-    "adminApplicationId": "3c219e58-ed0e-4b18-ad48-f4f92793ae32",
-    "vendorApplicationId": "0cc89d65-44e8-4662-940a-8e26c08b7a5e",
-    "storeApplicationId": "7c3a8d37-0e74-4a40-bc9e-df1d1d3f3456",
-    "employeeApplicationId": "8d4b9c2a-1f3e-4d5c-9a7b-6e8f0d1c2b3a",
+    "adminApplicationId": "84bfa7c6-cfaa-4194-82a9-3ed6b429f553",
+    "vendorApplicationId": "bc02396a-3248-457b-b6e4-1f98a87437bd",
+    "storeApplicationId": "9fb71511-a59b-422b-bcb1-b7f5e5bb28d9",
+    "employeeApplicationId": "7ed0c97a-c114-46e0-a874-6aa358fe4cd1",
     "fusionAuthBaseURL": "http://localhost:9011",
     "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
-    "adminUserId": "00000000-0000-0000-0000-000000000001"
+    "adminUserId": "00000000-0000-0000-0000-000000000001",
+    "callbackUrlBase": "http://localhost:9000",
+    "adminCallback1": "http://localhost:9000/auth/fusionauth/callback",
+    "adminCallback2": "http://localhost:9000/admin/auth/fusionauth/callback",
+    "adminLogoutUrl": "http://localhost:9000/admin/logout",
+    "vendorCallback1": "http://localhost:9000/auth/fusionauth/callback",
+    "vendorCallback2": "http://localhost:9000/vendor/auth/fusionauth/callback",
+    "vendorLogoutUrl": "http://localhost:9000/vendor/logout",
+    "storeCallback1": "http://localhost:9000/auth/fusionauth/callback",
+    "storeCallback2": "http://localhost:9000/store/auth/fusionauth/callback",
+    "storeLogoutUrl": "http://localhost:9000/store/logout",
+    "employeeCallback1": "http://localhost:9000/auth/fusionauth/callback",
+    "employeeCallback2": "http://localhost:9000/employee/auth/fusionauth/callback",
+    "employeeLogoutUrl": "http://localhost:9000/employee/logout",
+    "FUSIONAUTH_ADMIN_EMAIL": "admin@marketexpress.us",
+    "FUSIONAUTH_ADMIN_PASSWORD": "oIYfDqX2TU9xsLPRBMjQF0pJJVAHbOal",
+    "ADMIN_CLIENT_SECRET": "09MLZa9lQvaMvFGaesaEviVaTph8dyAHhlRoH93xF2y7uLi1GdHm297JanLhnQiN",
+    "VENDOR_CLIENT_SECRET": "yzWPgzc95Q51xVE6vEfsWd7oXCNqYrkdWOn7v02QVSTh0SDOjsk2lmRkwWfsm9MS",
+    "STORE_CLIENT_SECRET": "o51hDzBysU5xFQAoO73UEeu2lpHPZZN5D2kcsUjTXOEENBQk2rpCAFYO9a6hW1QL",
+    "EMPLOYEE_CLIENT_SECRET": "zXug1h9OjagAFgk8kf3KzHdCiHqnSIB9fmG4oNnv97fqs7563t1eSKEFt23GjMoO",
+    "FUSIONAUTH_API_KEY": "xCsOSKWaPTYy1DDJSZTrvbYUBWFpu2qyoukwaFsAKbINSD1xy8hpEDzeEUebn9r7"
   },
   "apiKeys": [
     {
@@ -27,35 +47,6 @@
   ],
   "requests": [
     {
-      "method": "PATCH",
-      "url": "/api/tenant/#{defaultTenantId}",
-      "body": {
-        "tenant": {
-          "name": "Market Express",
-          "issuer": "marketexpress.us",
-          "jwtConfiguration": {
-            "accessTokenKeyId": "#{FUSIONAUTH_TENANT_ACCESS_TOKEN_SIGNING_KEY}",
-            "idTokenKeyId": "#{FUSIONAUTH_TENANT_ID_TOKEN_SIGNING_KEY}",
-            "timeToLiveInSeconds": 28800,
-            "refreshTokenTimeToLiveInMinutes": 43200
-          },
-          "passwordValidationRules": {
-            "minLength": 8,
-            "requireMixedCase": false,
-            "requireNonAlpha": false,
-            "requireNumber": false,
-            "validateOnLogin": true
-          },
-          "failedAuthenticationConfiguration": {
-            "tooManyAttempts": 5,
-            "actionDuration": 300,
-            "actionDurationUnit": "SECONDS",
-            "resetCountInSeconds": 3600
-          }
-        }
-      }
-    },
-    {
       "method": "POST",
       "url": "/api/application/#{adminApplicationId}",
       "tenantId": "#{defaultTenantId}",
@@ -65,8 +56,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
-              "#{OAUTH_CALLBACK_BASE_URL}/admin/auth/fusionauth/callback"
+              "#{adminCallback1}",
+              "#{adminCallback2}"
             ],
             "clientId": "#{adminApplicationId}",
             "clientSecret": "#{ADMIN_CLIENT_SECRET}",
@@ -76,7 +67,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/admin/logout",
+            "logoutURL": "#{adminLogoutUrl}",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -88,15 +79,6 @@
           "loginConfiguration": {
             "requireAuthentication": true,
             "allowTokenRefresh": true
-          },
-          "multiFactorConfiguration": {
-            "loginPolicy": "Required",
-            "email": {
-              "templateId": "#{FUSIONAUTH_DEFAULT_EMAIL_TEMPLATE}"
-            },
-            "sms": {
-              "templateId": "#{FUSIONAUTH_DEFAULT_SMS_TEMPLATE}"
-            }
           },
           "registrationConfiguration": {
             "enabled": true,
@@ -129,8 +111,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
-              "#{OAUTH_CALLBACK_BASE_URL}/vendor/auth/fusionauth/callback"
+              "#{vendorCallback1}",
+              "#{vendorCallback2}"
             ],
             "clientId": "#{vendorApplicationId}",
             "clientSecret": "#{VENDOR_CLIENT_SECRET}",
@@ -140,7 +122,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/vendor/logout",
+            "logoutURL": "#{vendorLogoutUrl}",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -152,9 +134,6 @@
           "loginConfiguration": {
             "requireAuthentication": true,
             "allowTokenRefresh": true
-          },
-          "multiFactorConfiguration": {
-            "loginPolicy": "Disabled"
           },
           "registrationConfiguration": {
             "enabled": true,
@@ -193,8 +172,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
-              "#{OAUTH_CALLBACK_BASE_URL}/store/auth/fusionauth/callback"
+              "#{storeCallback1}",
+              "#{storeCallback2}"
             ],
             "clientId": "#{storeApplicationId}",
             "clientSecret": "#{STORE_CLIENT_SECRET}",
@@ -204,7 +183,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/store/logout",
+            "logoutURL": "#{storeLogoutUrl}",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -216,9 +195,6 @@
           "loginConfiguration": {
             "requireAuthentication": true,
             "allowTokenRefresh": true
-          },
-          "multiFactorConfiguration": {
-            "loginPolicy": "Disabled"
           },
           "registrationConfiguration": {
             "enabled": true,
@@ -245,8 +221,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
-              "#{OAUTH_CALLBACK_BASE_URL}/employee/auth/fusionauth/callback"
+              "#{employeeCallback1}",
+              "#{employeeCallback2}"
             ],
             "clientId": "#{employeeApplicationId}",
             "clientSecret": "#{EMPLOYEE_CLIENT_SECRET}",
@@ -256,7 +232,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/employee/logout",
+            "logoutURL": "#{employeeLogoutUrl}",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -268,9 +244,6 @@
           "loginConfiguration": {
             "requireAuthentication": true,
             "allowTokenRefresh": true
-          },
-          "multiFactorConfiguration": {
-            "loginPolicy": "Disabled"
           },
           "registrationConfiguration": {
             "enabled": true,
@@ -313,6 +286,16 @@
         },
         "sendSetPasswordEmail": false,
         "skipVerification": true
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{adminUserId}",
+      "body": {
+        "registration": {
+          "applicationId": "3c219e58-ed0e-4b18-ad48-f4f92793ae32",
+          "roles": ["admin"]
+        }
       }
     }
   ]
