@@ -1,0 +1,70 @@
+name: Deploy to VPS Dev
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    name: Deploy to 15.204.91.25
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_market-express-fusion
+          chmod 600 ~/.ssh/id_market-express-fusion
+          ssh-keyscan -H 15.204.91.25 >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        env:
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          FUSIONAUTH_ADMIN_EMAIL: ${{ secrets.FUSIONAUTH_ADMIN_EMAIL }}
+          FUSIONAUTH_ADMIN_PASSWORD: ${{ secrets.FUSIONAUTH_ADMIN_PASSWORD }}
+          FUSIONAUTH_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
+          ADMIN_CLIENT_SECRET: ${{ secrets.ADMIN_CLIENT_SECRET }}
+          VENDOR_CLIENT_SECRET: ${{ secrets.VENDOR_CLIENT_SECRET }}
+          STORE_CLIENT_SECRET: ${{ secrets.STORE_CLIENT_SECRET }}
+          EMPLOYEE_CLIENT_SECRET: ${{ secrets.EMPLOYEE_CLIENT_SECRET }}
+        run: |
+          # Copy project files to VPS
+          ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 "mkdir -p ~/fusionauth"
+
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_market-express-fusion" \
+            --exclude='.env' \
+            --exclude='.git' \
+            --exclude='*.backup.*' \
+            --exclude='backup*.sql' \
+            ./ fusion-auth@15.204.91.25:~/fusionauth/
+
+          # Run deployment script on VPS
+          ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 \
+            "cd ~/fusionauth && \
+             export DATABASE_PASSWORD='${DATABASE_PASSWORD}' && \
+             export FUSIONAUTH_ADMIN_EMAIL='${FUSIONAUTH_ADMIN_EMAIL}' && \
+             export FUSIONAUTH_ADMIN_PASSWORD='${FUSIONAUTH_ADMIN_PASSWORD}' && \
+             export FUSIONAUTH_API_KEY='${FUSIONAUTH_API_KEY}' && \
+             export ADMIN_CLIENT_SECRET='${ADMIN_CLIENT_SECRET}' && \
+             export VENDOR_CLIENT_SECRET='${VENDOR_CLIENT_SECRET}' && \
+             export STORE_CLIENT_SECRET='${STORE_CLIENT_SECRET}' && \
+             export EMPLOYEE_CLIENT_SECRET='${EMPLOYEE_CLIENT_SECRET}' && \
+             bash scripts/deploy-vps.sh"
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting 30 seconds for Traefik routing..."
+          sleep 30
+
+          if curl --fail --silent https://auth-dev.marketexpress.us/api/status; then
+            echo "✓ Deployment verified!"
+          else
+            echo "WARNING: Could not verify deployment (check manually)"
+            exit 1
+          fi

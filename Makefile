@@ -16,14 +16,20 @@
 #   make status   - Check service health
 #   make logs     - View container logs
 
-.PHONY: init update destroy status logs help clean backup env-dev
+.PHONY: init update destroy status logs help clean backup env-sandbox env-dev env-stage env-prod status-env
 
 # Default target
 help:
 	@echo "FusionAuth Deployment Automation"
 	@echo ""
+	@echo "Environment-specific targets:"
+	@echo "  make env-sandbox  - Generate sandbox .env (local development)"
+	@echo "  make env-dev      - Deploy to dev VPS (via GitHub Actions)"
+	@echo "  make env-stage    - Deploy to stage OCI (via GitHub Actions, requires release)"
+	@echo "  make env-prod     - Deploy to prod OCI (via GitHub Actions, requires release)"
+	@echo "  make status-env   - Show current environment configuration"
+	@echo ""
 	@echo "Available targets:"
-	@echo "  make env-dev  - Generate .env with secure random passwords"
 	@echo "  make init     - First-time deployment (creates .env, starts containers)"
 	@echo "  make update   - Deploy configuration changes (preserves data)"
 	@echo "  make destroy  - Tear down environment (optional data removal)"
@@ -32,10 +38,16 @@ help:
 	@echo "  make backup   - Backup PostgreSQL database to backup.sql"
 	@echo "  make clean    - Remove stopped containers and orphaned volumes"
 	@echo ""
-	@echo "Quick start:"
-	@echo "  1. make env-dev"
+	@echo "Quick start (Sandbox):"
+	@echo "  1. make env-sandbox"
 	@echo "  2. make init"
 	@echo "  3. Visit http://localhost:9011"
+	@echo ""
+	@echo "Quick start (Dev VPS):"
+	@echo "  1. Configure GitHub Secrets"
+	@echo "  2. git push origin main"
+	@echo "  3. Visit https://auth-dev.marketexpress.us"
+	@echo ""
 
 # First-time deployment
 init:
@@ -223,6 +235,59 @@ clean:
 	@echo "Cleanup complete"
 	@echo ""
 
-# Generate .env file with secure random passwords
-env-dev:
+# Environment-specific deployments
+env-sandbox:
+	@echo "Generating sandbox environment..."
 	@./scripts/generate-env.sh
+
+env-dev:
+	@echo "========================================="
+	@echo "Dev Environment Configuration"
+	@echo "========================================="
+	@echo ""
+	@echo "ERROR: Dev environment uses GitHub Secrets"
+	@echo "Deployment is handled via GitHub Actions:"
+	@echo ""
+	@echo "  git push origin main"
+	@echo ""
+	@echo "Manual VPS deployment:"
+	@echo "  ssh fusion-auth@15.204.91.25"
+	@echo "  cd ~/fusionauth"
+	@echo "  # Set environment variables from GitHub Secrets"
+	@echo "  bash scripts/deploy-vps.sh"
+	@echo ""
+
+env-stage:
+	@echo "========================================="
+	@echo "Stage Environment Configuration"
+	@echo "========================================="
+	@echo ""
+	@echo "ERROR: Stage deployment not yet implemented (Phase 4)"
+	@echo "Stage environment requires:"
+	@echo "  - OCI Kubernetes cluster setup"
+	@echo "  - Helm chart configuration"
+	@echo "  - Release version/tag"
+	@echo ""
+	@echo "Usage (future):"
+	@echo "  make env-stage RELEASE=v1.2.3"
+	@echo ""
+
+env-prod:
+	@echo "========================================="
+	@echo "Production Environment Configuration"
+	@echo "========================================="
+	@echo ""
+	@echo "ERROR: Production deployment not yet implemented (Phase 4)"
+	@echo "Production environment requires:"
+	@echo "  - OCI Kubernetes cluster setup"
+	@echo "  - Helm chart configuration"
+	@echo "  - Release version/tag"
+	@echo ""
+	@echo "Usage (future):"
+	@echo "  make env-prod RELEASE=v1.2.3"
+	@echo ""
+
+status-env:
+	@echo "Current environment: $$(grep '^ENVIRONMENT=' .env 2>/dev/null | cut -d= -f2 || echo 'unknown')"
+	@echo "Callback URL: $$(grep '^OAUTH_CALLBACK_BASE_URL=' .env 2>/dev/null | cut -d= -f2 || echo 'not set')"
+	@echo "FusionAuth URL: $$(grep '^FUSIONAUTH_PUBLIC_URL=' .env 2>/dev/null | cut -d= -f2 || echo 'not set')"

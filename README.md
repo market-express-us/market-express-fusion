@@ -12,12 +12,171 @@ Automated, repeatable FusionAuth deployment for marketexpress.us B2B marketplace
 This project deploys FusionAuth 1.53.2 identity provider with PostgreSQL 17.2 database backend for the Market Express B2B marketplace platform. Configuration is managed through Docker Compose with automated deployment via Make targets.
 
 **Key Features:**
-- Single-command deployment (`make init`)
+- Multi-environment deployment (sandbox, dev, stage, prod)
+- Single-command deployment (`make env-sandbox && make init`)
 - Automated Kickstart configuration (three pre-configured applications)
 - Persistent data storage across container recreations
 - Environment variable-based configuration (no hardcoded secrets)
 - Health check monitoring and graceful startup sequencing
 - Database backup and restore capabilities
+- CI/CD deployment via GitHub Actions
+
+## Multi-Environment Deployment
+
+This project supports 4 deployment environments with environment-specific configuration:
+
+| Environment | Infrastructure | Domain | Deployment Method | Status |
+|------------|---------------|--------|-------------------|--------|
+| **Sandbox** | Local workstation | localhost:9011 | `make env-sandbox && make init` | ✅ Active |
+| **Dev** | VPS 15.204.91.25 | auth-dev.marketexpress.us | `git push origin main` (GitHub Actions) | ✅ Active |
+| **Stage** | OCI Kubernetes | auth-stage.marketexpress.us | `make env-stage RELEASE=v1.2.3` | 🔜 Phase 4 |
+| **Prod** | OCI Kubernetes | auth.marketexpress.us | `make env-prod RELEASE=v1.2.3` | 🔜 Phase 4 |
+
+### Sandbox Deployment (Local)
+
+**Purpose:** Developer testing and local development
+
+**Prerequisites:**
+- Docker Desktop with Compose
+- No external dependencies
+
+**Quick Start:**
+```bash
+# Generate .env with random secrets
+make env-sandbox
+
+# Start containers
+make init
+
+# Access FusionAuth
+open http://localhost:9011
+```
+
+**Configuration:**
+- `ENVIRONMENT=sandbox`
+- `OAUTH_CALLBACK_BASE_URL=http://localhost:9000`
+- `FUSIONAUTH_PUBLIC_URL=http://localhost:9011`
+- Network: Internal bridge (no Traefik)
+- Port: 9011 exposed to localhost
+
+### Dev Deployment (VPS)
+
+**Purpose:** Team development and integration testing
+
+**Prerequisites:**
+- GitHub Secrets configured (see below)
+- Traefik proxy running on VPS with `market-express-proxy` network
+- DNS: `auth-dev.marketexpress.us` → 15.204.91.25
+- SSH access: `fusion-auth@15.204.91.25` with key `id_market-express-fusion`
+
+**Deployment:**
+```bash
+# Automatic deployment via GitHub Actions
+git add .
+git commit -m "feat: update FusionAuth configuration"
+git push origin main
+
+# GitHub Actions will:
+# 1. SSH to fusion-auth@15.204.91.25
+# 2. Create .env from GitHub Secrets
+# 3. Deploy with docker-compose
+# 4. Verify health checks
+```
+
+**Access:**
+- FusionAuth Admin: https://auth-dev.marketexpress.us
+- Application: https://app-dev.marketexpress.us
+
+**GitHub Secrets Required:**
+
+Configure these secrets in repository settings at:
+`github.com/[org]/market-express-fusion/settings/secrets/actions`
+
+- `VPS_SSH_KEY` - SSH private key (id_market-express-fusion)
+- `DATABASE_PASSWORD` - PostgreSQL password
+- `FUSIONAUTH_ADMIN_EMAIL` - Admin user email
+- `FUSIONAUTH_ADMIN_PASSWORD` - Admin user password
+- `FUSIONAUTH_API_KEY` - MercurJS API key (64 chars)
+- `ADMIN_CLIENT_SECRET` - Admin app OAuth secret (64 chars)
+- `VENDOR_CLIENT_SECRET` - Vendor app OAuth secret (64 chars)
+- `STORE_CLIENT_SECRET` - Store app OAuth secret (64 chars)
+- `EMPLOYEE_CLIENT_SECRET` - Employee app OAuth secret (64 chars)
+
+**Manual VPS Deployment:**
+
+If GitHub Actions fails or you need manual control:
+
+```bash
+# SSH to VPS
+ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25
+
+# Navigate to project
+cd ~/fusionauth
+
+# Set environment variables (from GitHub Secrets)
+export DATABASE_PASSWORD="..."
+export FUSIONAUTH_ADMIN_EMAIL="..."
+export FUSIONAUTH_ADMIN_PASSWORD="..."
+export FUSIONAUTH_API_KEY="..."
+export ADMIN_CLIENT_SECRET="..."
+export VENDOR_CLIENT_SECRET="..."
+export STORE_CLIENT_SECRET="..."
+export EMPLOYEE_CLIENT_SECRET="..."
+
+# Deploy
+bash scripts/deploy-vps.sh
+```
+
+**Configuration:**
+- `ENVIRONMENT=dev`
+- `OAUTH_CALLBACK_BASE_URL=https://app-dev.marketexpress.us`
+- `FUSIONAUTH_PUBLIC_URL=https://auth-dev.marketexpress.us`
+- Network: External Traefik network (`market-express-proxy`)
+- Port: Internal only (Traefik routes traffic)
+- TLS: Automatic via Let's Encrypt
+
+### Stage/Prod Deployment (OCI Kubernetes)
+
+**Status:** Not yet implemented (Phase 4)
+
+Stage and production deployments will use:
+- OCI Kubernetes clusters
+- Helm charts for deployment
+- OCI Key Management for secrets
+- Terraform for infrastructure provisioning
+- Release tags for version control
+
+**Planned Usage:**
+```bash
+# Stage deployment (requires release tag)
+make env-stage RELEASE=v1.2.3
+
+# Production deployment (requires release tag)
+make env-prod RELEASE=v1.2.3
+```
+
+### Environment-Specific URLs
+
+OAuth redirect URLs are automatically configured per environment via `OAUTH_CALLBACK_BASE_URL`:
+
+| Environment | Application Base URL | Redirect URLs |
+|------------|---------------------|---------------|
+| Sandbox | http://localhost:9000 | `/auth/fusionauth/callback`, `/admin/auth/fusionauth/callback`, `/vendor/auth/fusionauth/callback`, `/store/auth/fusionauth/callback`, `/employee/auth/fusionauth/callback` |
+| Dev | https://app-dev.marketexpress.us | Same paths as sandbox |
+| Stage | https://app-stage.marketexpress.us | Same paths as sandbox |
+| Prod | https://app.marketexpress.us | Same paths as sandbox |
+
+### Checking Current Environment
+
+```bash
+# View current environment configuration
+make status-env
+
+# Output example:
+# Current environment: sandbox
+# Callback URL: http://localhost:9000
+# FusionAuth URL: http://localhost:9011
+```
 
 ## Prerequisites
 
@@ -48,14 +207,14 @@ This project deploys FusionAuth 1.53.2 identity provider with PostgreSQL 17.2 da
 
 ## Quick Start
 
-### First-time Setup
+### First-time Setup (Sandbox)
 
 ```bash
 # Clone or navigate to project directory
 cd /path/to/market-express-fusion
 
 # Generate .env with cryptographically secure random passwords
-make env-dev
+make env-sandbox
 
 # Review generated .env (optional - adjust non-password settings if needed)
 cat .env
@@ -64,24 +223,26 @@ cat .env
 make init
 ```
 
-**What `make env-dev` does:**
+**What `make env-sandbox` does:**
 - Copies `.env.template` to `.env`
-- Generates 5 cryptographically secure random passwords using `/dev/urandom`
+- Generates 6 cryptographically secure random passwords using `/dev/urandom`
   - `DATABASE_PASSWORD` (32 characters) - PostgreSQL authentication
   - `FUSIONAUTH_API_KEY` (64 characters) - MercurJS integration API key
   - `ADMIN_CLIENT_SECRET` (64 characters) - Admin application OAuth2 secret
   - `VENDOR_CLIENT_SECRET` (64 characters) - Vendor application OAuth2 secret
   - `STORE_CLIENT_SECRET` (64 characters) - Store application OAuth2 secret
+  - `EMPLOYEE_CLIENT_SECRET` (64 characters) - Employee application OAuth2 secret
 - Backs up existing `.env` before overwriting (with timestamp)
 - Creates unique credentials for each deployment
 
 **Expected output:**
 ```
 FusionAuth Admin UI: http://localhost:9011
-Kickstart has configured three applications:
-  - marketexpress-admin  (platform administrators, MFA required)
-  - marketexpress-vendor (vendor users, MFA optional)
-  - marketexpress-store  (customers, MFA optional)
+Kickstart has configured four applications:
+  - marketexpress-admin    (platform administrators, MFA required)
+  - marketexpress-vendor   (vendor users, MFA optional)
+  - marketexpress-store    (customers, MFA optional)
+  - marketexpress-employee (internal employees, MFA optional)
 ```
 
 ### Accessing FusionAuth
@@ -148,7 +309,7 @@ make update
 
 ## Applications Configured
 
-Three applications are pre-configured via Kickstart per FUSION-AUTH.md specification:
+Four applications are pre-configured via Kickstart per FUSION-AUTH.md specification:
 
 ### 1. marketexpress-admin (Platform Administration)
 
@@ -203,6 +364,24 @@ Three applications are pre-configured via Kickstart per FUSION-AUTH.md specifica
 **OAuth Configuration:**
 - Client ID: `7c3a8d37-0e74-4a40-bc9e-df1d1d3f3456`
 - Redirect URLs: `http://localhost:9000/auth/fusionauth/callback`, `http://localhost:9000/store/auth/fusionauth/callback`
+
+### 4. marketexpress-employee (Employee Portal)
+
+**Purpose:** Internal employee access to operational tools, order processing, and customer support functions
+
+**Authentication:**
+- OAuth 2.0 Authorization Code flow
+- MFA: **Disabled** by default (configurable per user)
+- Session: 8 hours (28800 seconds)
+- Refresh token: 30 days (43200 minutes)
+
+**Roles:**
+- `employee-manager` - Management-level employee with access to reporting, team oversight, and operational dashboards
+- `employee-staff` (default role) - Standard employee with access to internal tools, order processing, and customer support functions
+
+**OAuth Configuration:**
+- Client ID: `8d4b9c2a-1f3e-4d5c-9a7b-6e8f0d1c2b3a`
+- Redirect URLs: `http://localhost:9000/auth/fusionauth/callback`, `http://localhost:9000/employee/auth/fusionauth/callback`
 
 ## Makefile Targets
 

@@ -4,6 +4,7 @@
     "adminApplicationId": "3c219e58-ed0e-4b18-ad48-f4f92793ae32",
     "vendorApplicationId": "0cc89d65-44e8-4662-940a-8e26c08b7a5e",
     "storeApplicationId": "7c3a8d37-0e74-4a40-bc9e-df1d1d3f3456",
+    "employeeApplicationId": "8d4b9c2a-1f3e-4d5c-9a7b-6e8f0d1c2b3a",
     "fusionAuthBaseURL": "http://localhost:9011",
     "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
     "adminUserId": "00000000-0000-0000-0000-000000000001"
@@ -64,8 +65,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "http://localhost:9000/auth/fusionauth/callback",
-              "http://localhost:9000/admin/auth/fusionauth/callback"
+              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
+              "#{OAUTH_CALLBACK_BASE_URL}/admin/auth/fusionauth/callback"
             ],
             "clientId": "#{adminApplicationId}",
             "clientSecret": "#{ADMIN_CLIENT_SECRET}",
@@ -75,7 +76,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "http://localhost:9000/admin/logout",
+            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/admin/logout",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -128,8 +129,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "http://localhost:9000/auth/fusionauth/callback",
-              "http://localhost:9000/vendor/auth/fusionauth/callback"
+              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
+              "#{OAUTH_CALLBACK_BASE_URL}/vendor/auth/fusionauth/callback"
             ],
             "clientId": "#{vendorApplicationId}",
             "clientSecret": "#{VENDOR_CLIENT_SECRET}",
@@ -139,7 +140,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "http://localhost:9000/vendor/logout",
+            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/vendor/logout",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -192,8 +193,8 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "http://localhost:9000/auth/fusionauth/callback",
-              "http://localhost:9000/store/auth/fusionauth/callback"
+              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
+              "#{OAUTH_CALLBACK_BASE_URL}/store/auth/fusionauth/callback"
             ],
             "clientId": "#{storeApplicationId}",
             "clientSecret": "#{STORE_CLIENT_SECRET}",
@@ -203,7 +204,7 @@
               "refresh_token"
             ],
             "generateRefreshTokens": true,
-            "logoutURL": "http://localhost:9000/store/logout",
+            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/store/logout",
             "requireRegistration": true,
             "scopeHandlingPolicy": "Strict"
           },
@@ -227,6 +228,64 @@
             {
               "name": "customer",
               "description": "Standard customer capabilities including browsing, purchasing, order tracking, and account management",
+              "isDefault": true,
+              "isSuperRole": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{employeeApplicationId}",
+      "tenantId": "#{defaultTenantId}",
+      "body": {
+        "application": {
+          "name": "marketexpress-employee",
+          "tenantId": "#{defaultTenantId}",
+          "oauthConfiguration": {
+            "authorizedRedirectURLs": [
+              "#{OAUTH_CALLBACK_BASE_URL}/auth/fusionauth/callback",
+              "#{OAUTH_CALLBACK_BASE_URL}/employee/auth/fusionauth/callback"
+            ],
+            "clientId": "#{employeeApplicationId}",
+            "clientSecret": "#{EMPLOYEE_CLIENT_SECRET}",
+            "clientAuthenticationPolicy": "Required",
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "logoutURL": "#{OAUTH_CALLBACK_BASE_URL}/employee/logout",
+            "requireRegistration": true,
+            "scopeHandlingPolicy": "Strict"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "timeToLiveInSeconds": 28800,
+            "refreshTokenTimeToLiveInMinutes": 43200
+          },
+          "loginConfiguration": {
+            "requireAuthentication": true,
+            "allowTokenRefresh": true
+          },
+          "multiFactorConfiguration": {
+            "loginPolicy": "Disabled"
+          },
+          "registrationConfiguration": {
+            "enabled": true,
+            "type": "basic"
+          },
+          "roles": [
+            {
+              "name": "employee-manager",
+              "description": "Management-level employee with access to reporting, team oversight, and operational dashboards",
+              "isDefault": false,
+              "isSuperRole": false
+            },
+            {
+              "name": "employee-staff",
+              "description": "Standard employee with access to internal tools, order processing, and customer support functions",
               "isDefault": true,
               "isSuperRole": false
             }
