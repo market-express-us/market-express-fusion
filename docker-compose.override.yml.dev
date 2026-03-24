@@ -1,19 +1,13 @@
 # VPS Dev Environment Override
-#
-# This file is deployed to VPS as docker-compose.override.yml via CI/CD
-# Docker Compose automatically merges this with docker-compose.yml
-#
 # Author: Colin Bitterfield
 # Email: colin@bitterfield.com
 # Date Created: 2026-01-20
 # Updated: 2026-03-24
-# Version: 1.1.0
+# Version: 1.2.0
 #
 # Changelog:
-#   1.1.0: Change Traefik routing from auth-dev.marketexpress.us to auth.marketexpress.us
-#          auth.marketexpress.us is the canonical FusionAuth subdomain
-#          Remove dev suffix — auth-dev was never added to DNS/cert
-#          Also add HTTP→HTTPS redirect router
+#   1.2.0: Add priority=10 to beat HostRegexp catch-all (auth-dev was never DNS-provisioned)
+#   1.1.0: Change Traefik host from auth-dev.marketexpress.us to auth.marketexpress.us
 #   1.0.0: Initial dev override
 
 services:
@@ -26,13 +20,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=market-express-proxy"
-      # HTTPS router
       - "traefik.http.routers.fusionauth.rule=Host(`auth.marketexpress.us`)"
       - "traefik.http.routers.fusionauth.entrypoints=websecure"
       - "traefik.http.routers.fusionauth.tls=true"
       - "traefik.http.routers.fusionauth.tls.certresolver=letsencrypt"
       - "traefik.http.services.fusionauth.loadbalancer.server.port=9011"
-      # Remove old auth-dev router if it exists (Traefik picks up by label name)
+      # Priority 10 ensures this beats the HostRegexp catch-all (priority 1, but
+      # auto-calculated length-based priority of HostRegexp can exceed Host())
+      - "traefik.http.routers.fusionauth.priority=10"
     ports: []
 
 networks:
