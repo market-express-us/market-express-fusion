@@ -1,10 +1,22 @@
+# Deploy FusionAuth to VPS Dev
+#
+# @version 2.0.0
+# @author Colin Bitterfield <colin@bitterfield.com>
+# @created 2026-01-04
+# @updated 2026-03-24
+#
+# Changelog:
+# - 2.0.0: Platform v2 — 5 apps (admin/vendor/b2b/b2c/b2g), groups, new admin users
+# - 1.1.0: Fixed verification URL (auth-dev → auth)
+# - 1.0.0: Initial version
+
 name: Deploy to VPS Dev
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -28,12 +40,19 @@ jobs:
           FUSIONAUTH_ADMIN_EMAIL: ${{ secrets.FUSIONAUTH_ADMIN_EMAIL }}
           FUSIONAUTH_ADMIN_PASSWORD: ${{ secrets.FUSIONAUTH_ADMIN_PASSWORD }}
           FUSIONAUTH_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
+          # v2 application client secrets
           ADMIN_CLIENT_SECRET: ${{ secrets.ADMIN_CLIENT_SECRET }}
           VENDOR_CLIENT_SECRET: ${{ secrets.VENDOR_CLIENT_SECRET }}
-          STORE_CLIENT_SECRET: ${{ secrets.STORE_CLIENT_SECRET }}
-          EMPLOYEE_CLIENT_SECRET: ${{ secrets.EMPLOYEE_CLIENT_SECRET }}
+          B2B_CLIENT_SECRET: ${{ secrets.B2B_CLIENT_SECRET }}
+          B2C_CLIENT_SECRET: ${{ secrets.B2C_CLIENT_SECRET }}
+          B2G_CLIENT_SECRET: ${{ secrets.B2G_CLIENT_SECRET }}
+          # v2 admin user passwords
+          ADMIN_FUSION_PASSWORD: ${{ secrets.ADMIN_FUSION_PASSWORD }}
+          ADMIN_EMPLOYEE_PASSWORD: ${{ secrets.ADMIN_EMPLOYEE_PASSWORD }}
+          ADMIN_B2B_PASSWORD: ${{ secrets.ADMIN_B2B_PASSWORD }}
+          ADMIN_B2G_PASSWORD: ${{ secrets.ADMIN_B2G_PASSWORD }}
+          ADMIN_B2C_PASSWORD: ${{ secrets.ADMIN_B2C_PASSWORD }}
         run: |
-          # Copy project files to VPS
           ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 "mkdir -p ~/fusionauth"
 
           rsync -avz --delete \
@@ -44,7 +63,6 @@ jobs:
             --exclude='backup*.sql' \
             ./ fusion-auth@15.204.91.25:~/fusionauth/
 
-          # Run deployment script on VPS
           ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 \
             "cd ~/fusionauth && \
              export DATABASE_PASSWORD='${DATABASE_PASSWORD}' && \
@@ -53,8 +71,14 @@ jobs:
              export FUSIONAUTH_API_KEY='${FUSIONAUTH_API_KEY}' && \
              export ADMIN_CLIENT_SECRET='${ADMIN_CLIENT_SECRET}' && \
              export VENDOR_CLIENT_SECRET='${VENDOR_CLIENT_SECRET}' && \
-             export STORE_CLIENT_SECRET='${STORE_CLIENT_SECRET}' && \
-             export EMPLOYEE_CLIENT_SECRET='${EMPLOYEE_CLIENT_SECRET}' && \
+             export B2B_CLIENT_SECRET='${B2B_CLIENT_SECRET}' && \
+             export B2C_CLIENT_SECRET='${B2C_CLIENT_SECRET}' && \
+             export B2G_CLIENT_SECRET='${B2G_CLIENT_SECRET}' && \
+             export ADMIN_FUSION_PASSWORD='${ADMIN_FUSION_PASSWORD}' && \
+             export ADMIN_EMPLOYEE_PASSWORD='${ADMIN_EMPLOYEE_PASSWORD}' && \
+             export ADMIN_B2B_PASSWORD='${ADMIN_B2B_PASSWORD}' && \
+             export ADMIN_B2G_PASSWORD='${ADMIN_B2G_PASSWORD}' && \
+             export ADMIN_B2C_PASSWORD='${ADMIN_B2C_PASSWORD}' && \
              bash scripts/deploy-vps.sh"
 
       - name: Verify deployment

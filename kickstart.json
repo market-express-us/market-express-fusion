@@ -1,55 +1,87 @@
 {
   "variables": {
     "defaultTenantId": "d7d09513-a3f5-401c-9685-34ab6c552453",
-    "adminApplicationId": "84bfa7c6-cfaa-4194-82a9-3ed6b429f553",
-    "vendorApplicationId": "bc02396a-3248-457b-b6e4-1f98a87437bd",
-    "storeApplicationId": "9fb71511-a59b-422b-bcb1-b7f5e5bb28d9",
-    "employeeApplicationId": "7ed0c97a-c114-46e0-a874-6aa358fe4cd1",
-    "fusionAuthBaseURL": "https://auth.marketexpress.us",
+
+    "adminApplicationId":  "3b57f6fd-8412-4ec1-adc8-d6a03ae4b45e",
+    "vendorApplicationId": "8488a6cc-5e28-481d-8633-7dbb9df1aac6",
+    "b2bApplicationId":    "e83d3213-e960-42aa-ac89-521c64d69387",
+    "b2cApplicationId":    "d785fbed-5c1b-4b3e-a3bd-c448216c2ae0",
+    "b2gApplicationId":    "7545587c-0b12-4e46-92a1-f9586624fea8",
+
+    "fusionAuthBaseURL":   "https://auth.marketexpress.us",
+    "backendURL":          "https://api.marketexpress.us",
+    "adminPanelURL":       "https://admin.marketexpress.us",
+    "vendorPortalURL":     "https://vendors.marketexpress.us",
+    "b2bStorefrontURL":    "https://business.marketexpress.us",
+    "b2cStorefrontURL":    "https://buyersclub.marketexpress.us",
+    "b2gStorefrontURL":    "https://government.marketexpress.us",
+    "wwwStorefrontURL":    "https://www.marketexpress.us",
+
     "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
-    "adminUserId": "00000000-0000-0000-0000-000000000001",
-    "backendURL": "https://api.marketexpress.us",
-    "devStorefrontURL": "https://dev.marketexpress.us",
-    "adminPanelURL": "https://admin.marketexpress.us",
-    "vendorPortalURL": "https://vendor.marketexpress.us",
-    "storeURL": "https://store.marketexpress.us",
-    "adminCallback1": "https://api.marketexpress.us/auth/fusionauth/callback",
-    "adminCallback2": "https://admin.marketexpress.us/admin/auth/fusionauth/callback",
-    "adminLogoutUrl": "https://admin.marketexpress.us/admin/logout",
-    "vendorCallback1": "https://api.marketexpress.us/auth/fusionauth/callback",
-    "vendorCallback2": "https://vendor.marketexpress.us/vendor/auth/fusionauth/callback",
-    "vendorLogoutUrl": "https://vendor.marketexpress.us/vendor/logout",
-    "storeCallback1": "https://dev.marketexpress.us/auth/fusionauth/callback",
-    "storeCallback2": "https://dev.marketexpress.us/store/auth/fusionauth/callback",
-    "storeLogoutUrl": "https://dev.marketexpress.us/store/logout",
-    "employeeCallback1": "https://api.marketexpress.us/auth/fusionauth/callback",
-    "employeeCallback2": "https://api.marketexpress.us/employee/auth/fusionauth/callback",
-    "employeeLogoutUrl": "https://api.marketexpress.us/employee/logout",
-    "FUSIONAUTH_ADMIN_EMAIL": "admin@marketexpress.us",
+
+    "ADMIN_CLIENT_SECRET":  "qyy0BgfOwqfSpWpZYKo7nE4xXgraaw_RKZ_AgeRKIBbf1zuy29F7fFNWuDloxLAu",
+    "VENDOR_CLIENT_SECRET": "4dWlBMdFSnAkbrelMJF0R9P4H5jRNIdeuMvAiTA5x2QbmuaTZAlx6lFTbG4KVPXt",
+    "B2B_CLIENT_SECRET":    "ECOA8XYs8Nqf_prTOS_cjpgh1yI04J0CCWA9sxkzA4BV4JKTOeoN179_CHwZKpJI",
+    "B2C_CLIENT_SECRET":    "u6VFupnt0hn9yLkOWK4e3wfuqAJDZ7xEH89XEhY6Dg1EtQ9Yx6L9uRlf3iMdXj",
+    "B2G_CLIENT_SECRET":    "TyoO_lC5WYgpTlkugyj1ThQvMc1-WxYC1-HtVE0SkjvAn21UaTxZBvmwkTxl00gG",
+
+    "FUSIONAUTH_API_KEY":        "#{ENV.FUSIONAUTH_API_KEY}",
+    "FUSIONAUTH_ADMIN_EMAIL":    "admin@marketexpress.us",
     "FUSIONAUTH_ADMIN_PASSWORD": "#{ENV.FUSIONAUTH_ADMIN_PASSWORD}",
-    "ADMIN_CLIENT_SECRET": "09MLZa9lQvaMvFGaesaEviVaTph8dyAHhlRoH93xF2y7uLi1GdHm297JanLhnQiN",
-    "VENDOR_CLIENT_SECRET": "yzWPgzc95Q51xVE6vEfsWd7oXCNqYrkdWOn7v02QVSTh0SDOjsk2lmRkwWfsm9MS",
-    "STORE_CLIENT_SECRET": "o51hDzBysU5xFQAoO73UEeu2lpHPZZN5D2kcsUjTXOEENBQk2rpCAFYO9a6hW1QL",
-    "EMPLOYEE_CLIENT_SECRET": "zXug1h9OjagAFgk8kf3KzHdCiHqnSIB9fmG4oNnv97fqs7563t1eSKEFt23GjMoO",
-    "FUSIONAUTH_API_KEY": "#{ENV.FUSIONAUTH_API_KEY}"
+
+    "platformAdminUserId": "00000000-0000-0000-0000-000000000001",
+    "adminFusionUserId":   "a994d05c-97ea-41f5-a2b8-9cae602eed2e",
+    "adminEmployeeUserId": "01ff5356-2b76-4cee-a736-4644a1824ee0",
+    "adminB2bUserId":      "622458e0-4aaf-4532-9c0a-d9f201ebb5de",
+    "adminB2gUserId":      "93df81e5-b32a-4955-895b-fa9baa3ac5cd",
+    "adminB2cUserId":      "f3e6a8d0-e7e5-4695-a5fe-9678c73d545d",
+
+    "adminFusionPassword":   "#{ENV.ADMIN_FUSION_PASSWORD}",
+    "adminEmployeePassword": "#{ENV.ADMIN_EMPLOYEE_PASSWORD}",
+    "adminB2bPassword":      "#{ENV.ADMIN_B2B_PASSWORD}",
+    "adminB2gPassword":      "#{ENV.ADMIN_B2G_PASSWORD}",
+    "adminB2cPassword":      "#{ENV.ADMIN_B2C_PASSWORD}",
+
+    "groupAdminOwnerId":     "11000001-0000-0000-0000-000000000001",
+    "groupAdminManagerId":   "11000001-0000-0000-0000-000000000002",
+    "groupAdminEmployeeId":  "11000001-0000-0000-0000-000000000003",
+    "groupVendorOwnerId":    "11000002-0000-0000-0000-000000000001",
+    "groupVendorAdminId":    "11000002-0000-0000-0000-000000000002",
+    "groupVendorEmployeeId": "11000002-0000-0000-0000-000000000003",
+    "groupB2bOwnerId":       "11000003-0000-0000-0000-000000000001",
+    "groupB2bAdminId":       "11000003-0000-0000-0000-000000000002",
+    "groupB2bEmployeeId":    "11000003-0000-0000-0000-000000000003",
+    "groupB2gOwnerId":       "11000004-0000-0000-0000-000000000001",
+    "groupB2gAdminId":       "11000004-0000-0000-0000-000000000002",
+    "groupB2gEmployeeId":    "11000004-0000-0000-0000-000000000003",
+    "groupB2cOwnerId":       "11000005-0000-0000-0000-000000000001",
+    "groupB2cAdminId":       "11000005-0000-0000-0000-000000000002",
+    "groupB2cEmployeeId":    "11000005-0000-0000-0000-000000000003"
   },
+
   "apiKeys": [
     {
       "id": "#{apiKeyId}",
       "key": "#{FUSIONAUTH_API_KEY}",
-      "description": "MercurJS integration API key",
+      "description": "MarketExpress platform integration API key",
       "permissions": {
         "endpoints": {
-          "/api/application": ["GET","POST","PUT","PATCH","DELETE"],
-          "/api/user": ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/application":       ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/user":              ["GET","POST","PUT","PATCH","DELETE"],
           "/api/user/registration": ["GET","POST","PUT","PATCH","DELETE"],
-          "/api/group": ["GET","POST","PUT","PATCH","DELETE"],
-          "/api/group/member": ["GET","POST","PUT","DELETE"]
+          "/api/group":             ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/group/member":      ["GET","POST","PUT","DELETE"],
+          "/api/jwt/refresh":       ["POST"],
+          "/api/login":             ["POST"],
+          "/api/logout":            ["POST"],
+          "/api/identity-provider": ["GET","POST","PUT","DELETE"]
         }
       }
     }
   ],
+
   "requests": [
+
     {
       "method": "POST",
       "url": "/api/application/#{adminApplicationId}",
@@ -60,14 +92,17 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{adminCallback1}",
-              "#{adminCallback2}",
-              "http://localhost:5173/auth/fusionauth/callback",
-              "http://localhost:5173/admin/auth/fusionauth/callback"
+              "#{backendURL}/auth/fusionauth/callback",
+              "#{adminPanelURL}/auth/fusionauth/callback",
+              "#{adminPanelURL}/admin/auth/fusionauth/callback",
+              "http://localhost:4400/auth/fusionauth/callback",
+              "http://localhost:4400/admin/auth/fusionauth/callback",
+              "http://localhost:5173/auth/fusionauth/callback"
             ],
             "authorizedOriginURLs": [
               "#{adminPanelURL}",
               "#{backendURL}",
+              "http://localhost:4400",
               "http://localhost:5173"
             ],
             "clientId": "#{adminApplicationId}",
@@ -75,40 +110,28 @@
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
-            "logoutURL": "#{adminLogoutUrl}",
+            "logoutURL": "#{adminPanelURL}/logout",
             "requireRegistration": true,
-            "scopeHandlingPolicy": "Strict"
+            "scopeHandlingPolicy": "Strict",
+            "proofKeyForCodeExchangePolicy": "Required"
           },
           "jwtConfiguration": {
             "enabled": true,
             "timeToLiveInSeconds": 28800,
             "refreshTokenTimeToLiveInMinutes": 43200
           },
-          "loginConfiguration": {
-            "requireAuthentication": true,
-            "allowTokenRefresh": true
-          },
-          "registrationConfiguration": {
-            "enabled": true,
-            "type": "basic"
-          },
+          "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
+          "registrationConfiguration": { "enabled": false, "type": "basic" },
+          "selfServiceRegistrationConfiguration": { "enabled": false },
           "roles": [
-            {
-              "name": "platform-admin",
-              "description": "Full platform management capabilities",
-              "isDefault": false,
-              "isSuperRole": false
-            },
-            {
-              "name": "platform-support",
-              "description": "Read-only access for customer support",
-              "isDefault": false,
-              "isSuperRole": false
-            }
+            { "name": "platform-admin",   "description": "Full platform management", "isDefault": false, "isSuperRole": false },
+            { "name": "platform-manager", "description": "Operations management", "isDefault": false, "isSuperRole": false },
+            { "name": "platform-support", "description": "Read-only support access", "isDefault": false, "isSuperRole": false }
           ]
         }
       }
     },
+
     {
       "method": "POST",
       "url": "/api/application/#{vendorApplicationId}",
@@ -119,175 +142,312 @@
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{vendorCallback1}",
-              "#{vendorCallback2}",
-              "http://localhost:7700/auth/fusionauth/callback",
-              "http://localhost:7700/vendor/auth/fusionauth/callback"
+              "#{backendURL}/auth/fusionauth/callback",
+              "#{vendorPortalURL}/auth/fusionauth/callback",
+              "#{vendorPortalURL}/vendor/auth/fusionauth/callback",
+              "http://localhost:4300/auth/fusionauth/callback",
+              "http://localhost:7700/auth/fusionauth/callback"
             ],
             "authorizedOriginURLs": [
-              "#{vendorPortalURL}",
-              "#{backendURL}",
-              "http://localhost:7700"
+              "#{vendorPortalURL}", "#{backendURL}",
+              "http://localhost:4300", "http://localhost:7700"
             ],
             "clientId": "#{vendorApplicationId}",
             "clientSecret": "#{VENDOR_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
-            "logoutURL": "#{vendorLogoutUrl}",
+            "logoutURL": "#{vendorPortalURL}/logout",
             "requireRegistration": true,
-            "scopeHandlingPolicy": "Strict"
+            "scopeHandlingPolicy": "Strict",
+            "proofKeyForCodeExchangePolicy": "Required"
           },
-          "jwtConfiguration": {
+          "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 28800, "refreshTokenTimeToLiveInMinutes": 43200 },
+          "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
+          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "selfServiceRegistrationConfiguration": {
             "enabled": true,
-            "timeToLiveInSeconds": 28800,
-            "refreshTokenTimeToLiveInMinutes": 43200
-          },
-          "loginConfiguration": {
-            "requireAuthentication": true,
-            "allowTokenRefresh": true
-          },
-          "registrationConfiguration": {
-            "enabled": true,
-            "type": "basic"
+            "confirmPassword": true,
+            "loginIdType": "email",
+            "registrationFields": [
+              { "name": "firstName", "required": true },
+              { "name": "lastName",  "required": true }
+            ]
           },
           "roles": [
-            {"name": "vendor-owner", "description": "Full seller account control", "isDefault": false, "isSuperRole": false},
-            {"name": "vendor-manager", "description": "Product, inventory, order management", "isDefault": false, "isSuperRole": false},
-            {"name": "vendor-staff", "description": "Order fulfillment and customer communication", "isDefault": false, "isSuperRole": false}
+            { "name": "vendor-owner",    "description": "Full seller account control", "isDefault": false, "isSuperRole": false },
+            { "name": "vendor-admin",    "description": "Product, order, inventory management", "isDefault": false, "isSuperRole": false },
+            { "name": "vendor-employee", "description": "Order fulfillment only", "isDefault": true, "isSuperRole": false }
           ]
         }
       }
     },
+
     {
       "method": "POST",
-      "url": "/api/application/#{storeApplicationId}",
+      "url": "/api/application/#{b2bApplicationId}",
       "tenantId": "#{defaultTenantId}",
       "body": {
         "application": {
-          "name": "marketexpress-store",
+          "name": "marketexpress-b2b",
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{storeCallback1}",
-              "#{storeCallback2}",
-              "#{storeURL}/auth/fusionauth/callback",
-              "#{storeURL}/store/auth/fusionauth/callback",
-              "http://localhost:4100/auth/fusionauth/callback",
-              "http://localhost:4100/store/auth/fusionauth/callback"
+              "#{backendURL}/auth/fusionauth/callback",
+              "#{b2bStorefrontURL}/auth/fusionauth/callback",
+              "#{wwwStorefrontURL}/auth/fusionauth/callback",
+              "http://localhost:4101/auth/fusionauth/callback"
             ],
             "authorizedOriginURLs": [
-              "#{devStorefrontURL}",
-              "#{storeURL}",
-              "http://localhost:4100"
+              "#{b2bStorefrontURL}", "#{wwwStorefrontURL}", "#{backendURL}", "http://localhost:4101"
             ],
-            "clientId": "#{storeApplicationId}",
-            "clientSecret": "#{STORE_CLIENT_SECRET}",
+            "clientId": "#{b2bApplicationId}",
+            "clientSecret": "#{B2B_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
-            "logoutURL": "#{storeLogoutUrl}",
+            "logoutURL": "#{b2bStorefrontURL}/logout",
             "requireRegistration": true,
-            "scopeHandlingPolicy": "Strict"
+            "scopeHandlingPolicy": "Strict",
+            "proofKeyForCodeExchangePolicy": "Required"
           },
-          "jwtConfiguration": {
+          "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 28800, "refreshTokenTimeToLiveInMinutes": 43200 },
+          "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
+          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "selfServiceRegistrationConfiguration": {
             "enabled": true,
-            "timeToLiveInSeconds": 28800,
-            "refreshTokenTimeToLiveInMinutes": 43200
-          },
-          "loginConfiguration": {
-            "requireAuthentication": true,
-            "allowTokenRefresh": true
-          },
-          "registrationConfiguration": {
-            "enabled": true,
-            "type": "basic"
+            "confirmPassword": true,
+            "loginIdType": "email",
+            "registrationFields": [
+              { "name": "firstName", "required": true },
+              { "name": "lastName",  "required": true },
+              { "name": "mobilePhone", "required": false }
+            ]
           },
           "roles": [
-            {"name": "customer", "description": "Standard customer capabilities", "isDefault": true, "isSuperRole": false}
+            { "name": "b2b-owner",       "description": "Company account owner", "isDefault": false, "isSuperRole": false },
+            { "name": "b2b-admin",       "description": "Company purchasing admin", "isDefault": false, "isSuperRole": false },
+            { "name": "b2b-employee",    "description": "Standard buyer", "isDefault": true, "isSuperRole": false },
+            { "name": "b2b-procurement", "description": "Compliance procurement buyer", "isDefault": false, "isSuperRole": false }
           ]
         }
       }
     },
+
     {
       "method": "POST",
-      "url": "/api/application/#{employeeApplicationId}",
+      "url": "/api/application/#{b2cApplicationId}",
       "tenantId": "#{defaultTenantId}",
       "body": {
         "application": {
-          "name": "marketexpress-employee",
+          "name": "marketexpress-b2c",
           "tenantId": "#{defaultTenantId}",
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
-              "#{employeeCallback1}",
-              "#{employeeCallback2}",
-              "http://localhost:9000/auth/fusionauth/callback",
-              "http://localhost:9000/employee/auth/fusionauth/callback"
+              "#{backendURL}/auth/fusionauth/callback",
+              "#{b2cStorefrontURL}/auth/fusionauth/callback",
+              "http://localhost:4102/auth/fusionauth/callback"
             ],
             "authorizedOriginURLs": [
-              "#{backendURL}",
-              "http://localhost:9000"
+              "#{b2cStorefrontURL}", "#{backendURL}", "http://localhost:4102"
             ],
-            "clientId": "#{employeeApplicationId}",
-            "clientSecret": "#{EMPLOYEE_CLIENT_SECRET}",
+            "clientId": "#{b2cApplicationId}",
+            "clientSecret": "#{B2C_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
             "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
-            "logoutURL": "#{employeeLogoutUrl}",
+            "logoutURL": "#{b2cStorefrontURL}/logout",
             "requireRegistration": true,
-            "scopeHandlingPolicy": "Strict"
+            "scopeHandlingPolicy": "Strict",
+            "proofKeyForCodeExchangePolicy": "Required"
           },
-          "jwtConfiguration": {
+          "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 28800, "refreshTokenTimeToLiveInMinutes": 43200 },
+          "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
+          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "selfServiceRegistrationConfiguration": {
             "enabled": true,
-            "timeToLiveInSeconds": 28800,
-            "refreshTokenTimeToLiveInMinutes": 43200
-          },
-          "loginConfiguration": {
-            "requireAuthentication": true,
-            "allowTokenRefresh": true
-          },
-          "registrationConfiguration": {
-            "enabled": true,
-            "type": "basic"
+            "confirmPassword": true,
+            "loginIdType": "email",
+            "registrationFields": [
+              { "name": "firstName", "required": true },
+              { "name": "lastName",  "required": true },
+              { "name": "mobilePhone", "required": false }
+            ]
           },
           "roles": [
-            {"name": "employee-manager", "description": "Management level access", "isDefault": false, "isSuperRole": false},
-            {"name": "employee-staff", "description": "Standard employee access", "isDefault": true, "isSuperRole": false}
+            { "name": "b2c-owner",   "description": "Individual account owner", "isDefault": false, "isSuperRole": false },
+            { "name": "b2c-member",  "description": "BuyersClub member", "isDefault": true, "isSuperRole": false },
+            { "name": "b2c-premium", "description": "Premium tier member", "isDefault": false, "isSuperRole": false }
           ]
         }
       }
     },
+
     {
       "method": "POST",
-      "url": "/api/user/registration/#{adminUserId}",
+      "url": "/api/application/#{b2gApplicationId}",
+      "tenantId": "#{defaultTenantId}",
+      "body": {
+        "application": {
+          "name": "marketexpress-b2g",
+          "tenantId": "#{defaultTenantId}",
+          "oauthConfiguration": {
+            "authorizedRedirectURLs": [
+              "#{backendURL}/auth/fusionauth/callback",
+              "#{b2gStorefrontURL}/auth/fusionauth/callback",
+              "http://localhost:4103/auth/fusionauth/callback"
+            ],
+            "authorizedOriginURLs": [
+              "#{b2gStorefrontURL}", "#{backendURL}", "http://localhost:4103"
+            ],
+            "clientId": "#{b2gApplicationId}",
+            "clientSecret": "#{B2G_CLIENT_SECRET}",
+            "clientAuthenticationPolicy": "Required",
+            "enabledGrants": ["authorization_code","refresh_token"],
+            "generateRefreshTokens": true,
+            "logoutURL": "#{b2gStorefrontURL}/logout",
+            "requireRegistration": true,
+            "scopeHandlingPolicy": "Strict",
+            "proofKeyForCodeExchangePolicy": "Required"
+          },
+          "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 28800, "refreshTokenTimeToLiveInMinutes": 43200 },
+          "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
+          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "selfServiceRegistrationConfiguration": {
+            "enabled": true,
+            "confirmPassword": true,
+            "loginIdType": "email",
+            "registrationFields": [
+              { "name": "firstName",   "required": true },
+              { "name": "lastName",    "required": true },
+              { "name": "mobilePhone", "required": false }
+            ]
+          },
+          "roles": [
+            { "name": "b2g-owner",      "description": "Agency account owner", "isDefault": false, "isSuperRole": false },
+            { "name": "b2g-admin",      "description": "Agency purchasing manager", "isDefault": false, "isSuperRole": false },
+            { "name": "b2g-employee",   "description": "Agency buyer", "isDefault": true, "isSuperRole": false },
+            { "name": "b2g-compliance", "description": "Compliance and audit", "isDefault": false, "isSuperRole": false }
+          ]
+        }
+      }
+    },
+
+    { "method": "POST", "url": "/api/group/#{groupAdminOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminOwnerId}",    "name": "admin-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupAdminManagerId}",  "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminManagerId}",  "name": "admin-manager",  "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupAdminEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminEmployeeId}", "name": "admin-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+
+    { "method": "POST", "url": "/api/group/#{groupVendorOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorOwnerId}",    "name": "vendor-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupVendorAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorAdminId}",    "name": "vendor-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupVendorEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorEmployeeId}", "name": "vendor-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+
+    { "method": "POST", "url": "/api/group/#{groupB2bOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bOwnerId}",    "name": "b2b-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2bAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bAdminId}",    "name": "b2b-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2bEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bEmployeeId}", "name": "b2b-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+
+    { "method": "POST", "url": "/api/group/#{groupB2gOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gOwnerId}",    "name": "b2g-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2gAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gAdminId}",    "name": "b2g-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2gEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gEmployeeId}", "name": "b2g-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+
+    { "method": "POST", "url": "/api/group/#{groupB2cOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cOwnerId}",    "name": "b2c-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2cAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cAdminId}",    "name": "b2c-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2cEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cEmployeeId}", "name": "b2c-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{platformAdminUserId}",
       "body": {
         "user": {
-          "id": "#{adminUserId}",
+          "id": "#{platformAdminUserId}",
           "email": "#{FUSIONAUTH_ADMIN_EMAIL}",
           "password": "#{FUSIONAUTH_ADMIN_PASSWORD}",
-          "firstName": "Platform",
-          "lastName": "Administrator",
-          "tenantId": "#{defaultTenantId}",
-          "active": true,
-          "verified": true
+          "firstName": "Platform", "lastName": "Administrator",
+          "tenantId": "#{defaultTenantId}", "active": true, "verified": true
         },
-        "registration": {
-          "applicationId": "#{adminApplicationId}",
-          "roles": ["platform-admin"]
-        },
-        "sendSetPasswordEmail": false,
-        "skipVerification": true
+        "registration": { "applicationId": "#{adminApplicationId}", "roles": ["platform-admin"] },
+        "sendSetPasswordEmail": false, "skipVerification": true
       }
     },
+
     {
       "method": "POST",
-      "url": "/api/user/registration/#{adminUserId}",
+      "url": "/api/user/registration/#{adminFusionUserId}",
       "body": {
-        "registration": {
-          "applicationId": "3c219e58-ed0e-4b18-ad48-f4f92793ae32",
-          "roles": ["admin"]
-        }
+        "user": {
+          "id": "#{adminFusionUserId}",
+          "email": "admin.fusion@marketexpress.us",
+          "password": "#{adminFusionPassword}",
+          "firstName": "FusionAuth", "lastName": "Admin",
+          "tenantId": "#{defaultTenantId}", "active": true, "verified": true
+        },
+        "registration": { "applicationId": "3c219e58-ed0e-4b18-ad48-f4f92793ae32", "roles": ["admin"] },
+        "sendSetPasswordEmail": false, "skipVerification": true
+      }
+    },
+
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{adminEmployeeUserId}",
+      "body": {
+        "user": {
+          "id": "#{adminEmployeeUserId}",
+          "email": "admin.employee@marketexpress.us",
+          "password": "#{adminEmployeePassword}",
+          "firstName": "Admin", "lastName": "Employee",
+          "tenantId": "#{defaultTenantId}", "active": true, "verified": true
+        },
+        "registration": { "applicationId": "#{adminApplicationId}", "roles": ["platform-admin"] },
+        "sendSetPasswordEmail": false, "skipVerification": true
+      }
+    },
+
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{adminB2bUserId}",
+      "body": {
+        "user": {
+          "id": "#{adminB2bUserId}",
+          "email": "admin.b2b@marketexpress.us",
+          "password": "#{adminB2bPassword}",
+          "firstName": "B2B", "lastName": "Admin",
+          "tenantId": "#{defaultTenantId}", "active": true, "verified": true
+        },
+        "registration": { "applicationId": "#{b2bApplicationId}", "roles": ["b2b-owner"] },
+        "sendSetPasswordEmail": false, "skipVerification": true
+      }
+    },
+
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{adminB2gUserId}",
+      "body": {
+        "user": {
+          "id": "#{adminB2gUserId}",
+          "email": "admin.b2g@marketexpress.us",
+          "password": "#{adminB2gPassword}",
+          "firstName": "B2G", "lastName": "Admin",
+          "tenantId": "#{defaultTenantId}", "active": true, "verified": true
+        },
+        "registration": { "applicationId": "#{b2gApplicationId}", "roles": ["b2g-owner"] },
+        "sendSetPasswordEmail": false, "skipVerification": true
+      }
+    },
+
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{adminB2cUserId}",
+      "body": {
+        "user": {
+          "id": "#{adminB2cUserId}",
+          "email": "admin.b2c@marketexpress.us",
+          "password": "#{adminB2cPassword}",
+          "firstName": "B2C", "lastName": "Admin",
+          "tenantId": "#{defaultTenantId}", "active": true, "verified": true
+        },
+        "registration": { "applicationId": "#{b2cApplicationId}", "roles": ["b2c-owner"] },
+        "sendSetPasswordEmail": false, "skipVerification": true
       }
     }
+
   ]
 }
