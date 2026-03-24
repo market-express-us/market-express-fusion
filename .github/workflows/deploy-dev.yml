@@ -62,7 +62,7 @@ jobs:
           echo "Waiting 30 seconds for Traefik routing..."
           sleep 30
 
-          if curl --fail --silent https://auth-dev.marketexpress.us/api/status; then
+          if curl --fail --silent https://auth.marketexpress.us/api/status; then
             echo "✓ Deployment verified!"
           else
             echo "WARNING: Could not verify deployment (check manually)"
