@@ -5,42 +5,46 @@
     "vendorApplicationId": "bc02396a-3248-457b-b6e4-1f98a87437bd",
     "storeApplicationId": "9fb71511-a59b-422b-bcb1-b7f5e5bb28d9",
     "employeeApplicationId": "7ed0c97a-c114-46e0-a874-6aa358fe4cd1",
-    "fusionAuthBaseURL": "http://localhost:9011",
+    "fusionAuthBaseURL": "https://auth.marketexpress.us",
     "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
     "adminUserId": "00000000-0000-0000-0000-000000000001",
-    "callbackUrlBase": "http://localhost:9000",
-    "adminCallback1": "http://localhost:9000/auth/fusionauth/callback",
-    "adminCallback2": "http://localhost:9000/admin/auth/fusionauth/callback",
-    "adminLogoutUrl": "http://localhost:9000/admin/logout",
-    "vendorCallback1": "http://localhost:9000/auth/fusionauth/callback",
-    "vendorCallback2": "http://localhost:9000/vendor/auth/fusionauth/callback",
-    "vendorLogoutUrl": "http://localhost:9000/vendor/logout",
-    "storeCallback1": "http://localhost:9000/auth/fusionauth/callback",
-    "storeCallback2": "http://localhost:9000/store/auth/fusionauth/callback",
-    "storeLogoutUrl": "http://localhost:9000/store/logout",
-    "employeeCallback1": "http://localhost:9000/auth/fusionauth/callback",
-    "employeeCallback2": "http://localhost:9000/employee/auth/fusionauth/callback",
-    "employeeLogoutUrl": "http://localhost:9000/employee/logout",
+    "backendURL": "https://api.marketexpress.us",
+    "devStorefrontURL": "https://dev.marketexpress.us",
+    "adminPanelURL": "https://admin.marketexpress.us",
+    "vendorPortalURL": "https://vendor.marketexpress.us",
+    "storeURL": "https://store.marketexpress.us",
+    "adminCallback1": "https://api.marketexpress.us/auth/fusionauth/callback",
+    "adminCallback2": "https://admin.marketexpress.us/admin/auth/fusionauth/callback",
+    "adminLogoutUrl": "https://admin.marketexpress.us/admin/logout",
+    "vendorCallback1": "https://api.marketexpress.us/auth/fusionauth/callback",
+    "vendorCallback2": "https://vendor.marketexpress.us/vendor/auth/fusionauth/callback",
+    "vendorLogoutUrl": "https://vendor.marketexpress.us/vendor/logout",
+    "storeCallback1": "https://dev.marketexpress.us/auth/fusionauth/callback",
+    "storeCallback2": "https://dev.marketexpress.us/store/auth/fusionauth/callback",
+    "storeLogoutUrl": "https://dev.marketexpress.us/store/logout",
+    "employeeCallback1": "https://api.marketexpress.us/auth/fusionauth/callback",
+    "employeeCallback2": "https://api.marketexpress.us/employee/auth/fusionauth/callback",
+    "employeeLogoutUrl": "https://api.marketexpress.us/employee/logout",
     "FUSIONAUTH_ADMIN_EMAIL": "admin@marketexpress.us",
-    "FUSIONAUTH_ADMIN_PASSWORD": "oIYfDqX2TU9xsLPRBMjQF0pJJVAHbOal",
+    "FUSIONAUTH_ADMIN_PASSWORD": "#{ENV.FUSIONAUTH_ADMIN_PASSWORD}",
     "ADMIN_CLIENT_SECRET": "09MLZa9lQvaMvFGaesaEviVaTph8dyAHhlRoH93xF2y7uLi1GdHm297JanLhnQiN",
     "VENDOR_CLIENT_SECRET": "yzWPgzc95Q51xVE6vEfsWd7oXCNqYrkdWOn7v02QVSTh0SDOjsk2lmRkwWfsm9MS",
     "STORE_CLIENT_SECRET": "o51hDzBysU5xFQAoO73UEeu2lpHPZZN5D2kcsUjTXOEENBQk2rpCAFYO9a6hW1QL",
     "EMPLOYEE_CLIENT_SECRET": "zXug1h9OjagAFgk8kf3KzHdCiHqnSIB9fmG4oNnv97fqs7563t1eSKEFt23GjMoO",
-    "FUSIONAUTH_API_KEY": "xCsOSKWaPTYy1DDJSZTrvbYUBWFpu2qyoukwaFsAKbINSD1xy8hpEDzeEUebn9r7"
+    "FUSIONAUTH_API_KEY": "#{ENV.FUSIONAUTH_API_KEY}"
   },
   "apiKeys": [
     {
       "id": "#{apiKeyId}",
       "key": "#{FUSIONAUTH_API_KEY}",
-      "description": "MercurJS integration API key (from environment)",
+      "description": "MercurJS integration API key",
       "permissions": {
         "endpoints": {
-          "/api/application": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-          "/api/user": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-          "/api/user/registration": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-          "/api/group": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-          "/api/group/member": ["GET", "POST", "PUT", "DELETE"]
+          "/api/application": ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/user": ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/user/registration": ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/group": ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/group/member": ["GET","POST","PUT","DELETE"]
         }
       }
     }
@@ -57,15 +61,19 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{adminCallback1}",
-              "#{adminCallback2}"
+              "#{adminCallback2}",
+              "http://localhost:5173/auth/fusionauth/callback",
+              "http://localhost:5173/admin/auth/fusionauth/callback"
+            ],
+            "authorizedOriginURLs": [
+              "#{adminPanelURL}",
+              "#{backendURL}",
+              "http://localhost:5173"
             ],
             "clientId": "#{adminApplicationId}",
             "clientSecret": "#{ADMIN_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
-            "enabledGrants": [
-              "authorization_code",
-              "refresh_token"
-            ],
+            "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
             "logoutURL": "#{adminLogoutUrl}",
             "requireRegistration": true,
@@ -87,13 +95,13 @@
           "roles": [
             {
               "name": "platform-admin",
-              "description": "Full platform management capabilities including system configuration, user management, and vendor oversight",
+              "description": "Full platform management capabilities",
               "isDefault": false,
               "isSuperRole": false
             },
             {
               "name": "platform-support",
-              "description": "Read-only access with limited user management for customer support operations",
+              "description": "Read-only access for customer support",
               "isDefault": false,
               "isSuperRole": false
             }
@@ -112,15 +120,19 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{vendorCallback1}",
-              "#{vendorCallback2}"
+              "#{vendorCallback2}",
+              "http://localhost:7700/auth/fusionauth/callback",
+              "http://localhost:7700/vendor/auth/fusionauth/callback"
+            ],
+            "authorizedOriginURLs": [
+              "#{vendorPortalURL}",
+              "#{backendURL}",
+              "http://localhost:7700"
             ],
             "clientId": "#{vendorApplicationId}",
             "clientSecret": "#{VENDOR_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
-            "enabledGrants": [
-              "authorization_code",
-              "refresh_token"
-            ],
+            "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
             "logoutURL": "#{vendorLogoutUrl}",
             "requireRegistration": true,
@@ -140,24 +152,9 @@
             "type": "basic"
           },
           "roles": [
-            {
-              "name": "vendor-owner",
-              "description": "Full seller account control including financial settings, team management, and storefront configuration",
-              "isDefault": false,
-              "isSuperRole": false
-            },
-            {
-              "name": "vendor-manager",
-              "description": "Product, inventory, order, and team member management without financial or ownership controls",
-              "isDefault": false,
-              "isSuperRole": false
-            },
-            {
-              "name": "vendor-staff",
-              "description": "Order fulfillment and customer communication only, no product or team management",
-              "isDefault": false,
-              "isSuperRole": false
-            }
+            {"name": "vendor-owner", "description": "Full seller account control", "isDefault": false, "isSuperRole": false},
+            {"name": "vendor-manager", "description": "Product, inventory, order management", "isDefault": false, "isSuperRole": false},
+            {"name": "vendor-staff", "description": "Order fulfillment and customer communication", "isDefault": false, "isSuperRole": false}
           ]
         }
       }
@@ -173,15 +170,21 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{storeCallback1}",
-              "#{storeCallback2}"
+              "#{storeCallback2}",
+              "#{storeURL}/auth/fusionauth/callback",
+              "#{storeURL}/store/auth/fusionauth/callback",
+              "http://localhost:4100/auth/fusionauth/callback",
+              "http://localhost:4100/store/auth/fusionauth/callback"
+            ],
+            "authorizedOriginURLs": [
+              "#{devStorefrontURL}",
+              "#{storeURL}",
+              "http://localhost:4100"
             ],
             "clientId": "#{storeApplicationId}",
             "clientSecret": "#{STORE_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
-            "enabledGrants": [
-              "authorization_code",
-              "refresh_token"
-            ],
+            "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
             "logoutURL": "#{storeLogoutUrl}",
             "requireRegistration": true,
@@ -201,12 +204,7 @@
             "type": "basic"
           },
           "roles": [
-            {
-              "name": "customer",
-              "description": "Standard customer capabilities including browsing, purchasing, order tracking, and account management",
-              "isDefault": true,
-              "isSuperRole": false
-            }
+            {"name": "customer", "description": "Standard customer capabilities", "isDefault": true, "isSuperRole": false}
           ]
         }
       }
@@ -222,15 +220,18 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{employeeCallback1}",
-              "#{employeeCallback2}"
+              "#{employeeCallback2}",
+              "http://localhost:9000/auth/fusionauth/callback",
+              "http://localhost:9000/employee/auth/fusionauth/callback"
+            ],
+            "authorizedOriginURLs": [
+              "#{backendURL}",
+              "http://localhost:9000"
             ],
             "clientId": "#{employeeApplicationId}",
             "clientSecret": "#{EMPLOYEE_CLIENT_SECRET}",
             "clientAuthenticationPolicy": "Required",
-            "enabledGrants": [
-              "authorization_code",
-              "refresh_token"
-            ],
+            "enabledGrants": ["authorization_code","refresh_token"],
             "generateRefreshTokens": true,
             "logoutURL": "#{employeeLogoutUrl}",
             "requireRegistration": true,
@@ -250,18 +251,8 @@
             "type": "basic"
           },
           "roles": [
-            {
-              "name": "employee-manager",
-              "description": "Management-level employee with access to reporting, team oversight, and operational dashboards",
-              "isDefault": false,
-              "isSuperRole": false
-            },
-            {
-              "name": "employee-staff",
-              "description": "Standard employee with access to internal tools, order processing, and customer support functions",
-              "isDefault": true,
-              "isSuperRole": false
-            }
+            {"name": "employee-manager", "description": "Management level access", "isDefault": false, "isSuperRole": false},
+            {"name": "employee-staff", "description": "Standard employee access", "isDefault": true, "isSuperRole": false}
           ]
         }
       }
