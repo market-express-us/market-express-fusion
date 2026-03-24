@@ -6,29 +6,33 @@
 # Author: Colin Bitterfield
 # Email: colin@bitterfield.com
 # Date Created: 2026-01-20
-# Version: 1.0.0
+# Updated: 2026-03-24
+# Version: 1.1.0
+#
+# Changelog:
+#   1.1.0: Change Traefik routing from auth-dev.marketexpress.us to auth.marketexpress.us
+#          auth.marketexpress.us is the canonical FusionAuth subdomain
+#          Remove dev suffix — auth-dev was never added to DNS/cert
+#          Also add HTTP→HTTPS redirect router
+#   1.0.0: Initial dev override
 
 services:
   fusionauth:
     volumes:
-      # Mount dev-specific kickstart configuration
       - ./kickstart-dev.json:/usr/local/fusionauth/kickstart/kickstart-dev.json:ro
-
     networks:
       - db_net
-      - market-express-proxy  # External Traefik network
-
+      - market-express-proxy
     labels:
-      # Traefik configuration for dev subdomain
       - "traefik.enable=true"
-      - "traefik.http.routers.fusionauth-dev.rule=Host(`auth-dev.marketexpress.us`)"
-      - "traefik.http.routers.fusionauth-dev.entrypoints=websecure"
-      - "traefik.http.routers.fusionauth-dev.tls=true"
-      - "traefik.http.routers.fusionauth-dev.tls.certresolver=letsencrypt"
-      - "traefik.http.services.fusionauth-dev.loadbalancer.server.port=9011"
       - "traefik.docker.network=market-express-proxy"
-
-    # Don't expose port 9011 to host (Traefik handles routing)
+      # HTTPS router
+      - "traefik.http.routers.fusionauth.rule=Host(`auth.marketexpress.us`)"
+      - "traefik.http.routers.fusionauth.entrypoints=websecure"
+      - "traefik.http.routers.fusionauth.tls=true"
+      - "traefik.http.routers.fusionauth.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fusionauth.loadbalancer.server.port=9011"
+      # Remove old auth-dev router if it exists (Traefik picks up by label name)
     ports: []
 
 networks:
