@@ -6,8 +6,12 @@
 # Author: Colin Bitterfield
 # Email: colin@bitterfield.com
 # Date Created: 2026-01-20
-# Date Updated: 2026-01-20
-# Version: 1.0.0
+# Date Updated: 2026-03-25
+# Version: 2.0.0
+#
+# Changelog:
+#   2.0.0: Platform v2 — update REQUIRED_VARS for B2B/B2C/B2G secrets + admin passwords
+#   1.0.0: Initial version
 
 set -euo pipefail
 
@@ -29,8 +33,14 @@ REQUIRED_VARS=(
   "FUSIONAUTH_API_KEY"
   "ADMIN_CLIENT_SECRET"
   "VENDOR_CLIENT_SECRET"
-  "STORE_CLIENT_SECRET"
-  "EMPLOYEE_CLIENT_SECRET"
+  "B2B_CLIENT_SECRET"
+  "B2C_CLIENT_SECRET"
+  "B2G_CLIENT_SECRET"
+  "ADMIN_FUSION_PASSWORD"
+  "ADMIN_EMPLOYEE_PASSWORD"
+  "ADMIN_B2B_PASSWORD"
+  "ADMIN_B2G_PASSWORD"
+  "ADMIN_B2C_PASSWORD"
 )
 
 for var in "${REQUIRED_VARS[@]}"; do
@@ -64,16 +74,22 @@ FUSIONAUTH_APP_KICKSTART_FILE=/usr/local/fusionauth/kickstart/kickstart-dev.json
 FUSIONAUTH_API_KEY=${FUSIONAUTH_API_KEY}
 ADMIN_CLIENT_SECRET=${ADMIN_CLIENT_SECRET}
 VENDOR_CLIENT_SECRET=${VENDOR_CLIENT_SECRET}
-STORE_CLIENT_SECRET=${STORE_CLIENT_SECRET}
-EMPLOYEE_CLIENT_SECRET=${EMPLOYEE_CLIENT_SECRET}
+B2B_CLIENT_SECRET=${B2B_CLIENT_SECRET}
+B2C_CLIENT_SECRET=${B2C_CLIENT_SECRET}
+B2G_CLIENT_SECRET=${B2G_CLIENT_SECRET}
 
-# Admin User
+# Admin User Credentials
 FUSIONAUTH_ADMIN_EMAIL=${FUSIONAUTH_ADMIN_EMAIL}
 FUSIONAUTH_ADMIN_PASSWORD=${FUSIONAUTH_ADMIN_PASSWORD}
+ADMIN_FUSION_PASSWORD=${ADMIN_FUSION_PASSWORD}
+ADMIN_EMPLOYEE_PASSWORD=${ADMIN_EMPLOYEE_PASSWORD}
+ADMIN_B2B_PASSWORD=${ADMIN_B2B_PASSWORD}
+ADMIN_B2G_PASSWORD=${ADMIN_B2G_PASSWORD}
+ADMIN_B2C_PASSWORD=${ADMIN_B2C_PASSWORD}
 
 # Environment-specific URLs
-OAUTH_CALLBACK_BASE_URL=https://app-dev.marketexpress.us
-FUSIONAUTH_PUBLIC_URL=https://auth-dev.marketexpress.us
+OAUTH_CALLBACK_BASE_URL=https://api.marketexpress.us
+FUSIONAUTH_PUBLIC_URL=https://auth.marketexpress.us
 EOF
 
 echo "✓ Created .env from GitHub Secrets"
@@ -122,7 +138,7 @@ done
 # Verify Traefik connectivity (optional check)
 if command -v curl &> /dev/null; then
   echo "Verifying Traefik connectivity..."
-  if curl --fail --silent https://auth-dev.marketexpress.us/api/status >/dev/null 2>&1; then
+  if curl --fail --silent https://auth.marketexpress.us/api/status >/dev/null 2>&1; then
     echo -e "${GREEN}✓ Traefik routing verified${NC}"
   else
     echo -e "${YELLOW}WARNING: Traefik routing not verified (may take a few minutes)${NC}"
@@ -134,6 +150,6 @@ echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Deployment Complete!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
-echo "FusionAuth Dev: https://auth-dev.marketexpress.us"
-echo "Application Dev: https://app-dev.marketexpress.us"
+echo "FusionAuth: https://auth.marketexpress.us"
+echo "API: https://api.marketexpress.us"
 echo ""
