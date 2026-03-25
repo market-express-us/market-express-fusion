@@ -194,9 +194,15 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{backendURL}/auth/fusionauth/callback",
+              "#{b2bStorefrontURL}/auth/callback",
               "#{b2bStorefrontURL}/auth/fusionauth/callback",
+              "#{b2bStorefrontURL}/onboarding",
+              "#{wwwStorefrontURL}/auth/callback",
               "#{wwwStorefrontURL}/auth/fusionauth/callback",
-              "http://localhost:4101/auth/fusionauth/callback"
+              "#{wwwStorefrontURL}/onboarding",
+              "http://localhost:4101/auth/callback",
+              "http://localhost:4101/auth/fusionauth/callback",
+              "http://localhost:4101/onboarding"
             ],
             "authorizedOriginURLs": [
               "#{b2bStorefrontURL}", "#{wwwStorefrontURL}", "#{backendURL}", "http://localhost:4101"
@@ -245,8 +251,12 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{backendURL}/auth/fusionauth/callback",
+              "#{b2cStorefrontURL}/auth/callback",
               "#{b2cStorefrontURL}/auth/fusionauth/callback",
-              "http://localhost:4102/auth/fusionauth/callback"
+              "#{b2cStorefrontURL}/onboarding",
+              "http://localhost:4102/auth/callback",
+              "http://localhost:4102/auth/fusionauth/callback",
+              "http://localhost:4102/onboarding"
             ],
             "authorizedOriginURLs": [
               "#{b2cStorefrontURL}", "#{backendURL}", "http://localhost:4102"
@@ -294,8 +304,12 @@
           "oauthConfiguration": {
             "authorizedRedirectURLs": [
               "#{backendURL}/auth/fusionauth/callback",
+              "#{b2gStorefrontURL}/auth/callback",
               "#{b2gStorefrontURL}/auth/fusionauth/callback",
-              "http://localhost:4103/auth/fusionauth/callback"
+              "#{b2gStorefrontURL}/onboarding",
+              "http://localhost:4103/auth/callback",
+              "http://localhost:4103/auth/fusionauth/callback",
+              "http://localhost:4103/onboarding"
             ],
             "authorizedOriginURLs": [
               "#{b2gStorefrontURL}", "#{backendURL}", "http://localhost:4103"
