@@ -17,7 +17,7 @@
     "b2gStorefrontURL":    "https://government.marketexpress.us",
     "wwwStorefrontURL":    "https://www.marketexpress.us",
 
-    "apiKeyId": "c6c0a7e5-8e1b-4e0e-8e5b-5a6c0a7e5a6c",
+    "apiKeyId": "#{ENV.FUSIONAUTH_API_KEY_ID}",
 
     "ADMIN_CLIENT_SECRET":  "#{ENV.ADMIN_CLIENT_SECRET}",
     "VENDOR_CLIENT_SECRET": "#{ENV.VENDOR_CLIENT_SECRET}",
