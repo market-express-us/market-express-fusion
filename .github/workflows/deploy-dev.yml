@@ -1,11 +1,13 @@
 # Deploy FusionAuth to VPS Dev
 #
-# @version 2.1.0
+# @version 2.2.0
 # @author Colin Bitterfield <colin@bitterfield.com>
 # @created 2026-01-04
-# @updated 2026-03-25
+# @updated 2026-04-06
 #
 # Changelog:
+# - 2.2.0: Add FA_TENANT_ID, FA_APP_ID_*, FUSIONAUTH_API_KEY_ID, FA_SMTP_* secrets
+#          required for kickstart variable substitution and Mailersend SMTP config
 # - 2.1.0: Add workflow_dispatch rebuild input; fix v2 secret vars in deploy script
 # - 2.0.0: Platform v2 — 5 apps (admin/vendor/b2b/b2c/b2g), groups, new admin users
 # - 1.1.0: Fixed verification URL (auth-dev → auth)
@@ -50,6 +52,14 @@ jobs:
           FUSIONAUTH_ADMIN_EMAIL: ${{ secrets.FUSIONAUTH_ADMIN_EMAIL }}
           FUSIONAUTH_ADMIN_PASSWORD: ${{ secrets.FUSIONAUTH_ADMIN_PASSWORD }}
           FUSIONAUTH_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
+          FUSIONAUTH_API_KEY_ID: ${{ secrets.FUSIONAUTH_API_KEY_ID }}
+          # Tenant and application IDs (match live instance)
+          FA_TENANT_ID: ${{ secrets.FA_TENANT_ID }}
+          FA_APP_ID_ADMIN: ${{ secrets.FA_APP_ID_ADMIN }}
+          FA_APP_ID_VENDOR: ${{ secrets.FA_APP_ID_VENDOR }}
+          FA_APP_ID_B2B: ${{ secrets.FA_APP_ID_B2B }}
+          FA_APP_ID_B2C: ${{ secrets.FA_APP_ID_B2C }}
+          FA_APP_ID_B2G: ${{ secrets.FA_APP_ID_B2G }}
           # v2 application client secrets
           ADMIN_CLIENT_SECRET: ${{ secrets.ADMIN_CLIENT_SECRET }}
           VENDOR_CLIENT_SECRET: ${{ secrets.VENDOR_CLIENT_SECRET }}
@@ -62,6 +72,13 @@ jobs:
           ADMIN_B2B_PASSWORD: ${{ secrets.ADMIN_B2B_PASSWORD }}
           ADMIN_B2G_PASSWORD: ${{ secrets.ADMIN_B2G_PASSWORD }}
           ADMIN_B2C_PASSWORD: ${{ secrets.ADMIN_B2C_PASSWORD }}
+          # Mailersend SMTP for FusionAuth emails
+          FA_SMTP_HOST: ${{ secrets.FA_SMTP_HOST }}
+          FA_SMTP_PORT: ${{ secrets.FA_SMTP_PORT }}
+          FA_SMTP_USER: ${{ secrets.FA_SMTP_USER }}
+          FA_SMTP_PASS: ${{ secrets.FA_SMTP_PASS }}
+          FA_SMTP_FROM_EMAIL: ${{ secrets.FA_SMTP_FROM_EMAIL }}
+          FA_SMTP_FROM_NAME: ${{ secrets.FA_SMTP_FROM_NAME }}
         run: |
           ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 "mkdir -p ~/fusionauth"
 
@@ -79,6 +96,13 @@ jobs:
              export FUSIONAUTH_ADMIN_EMAIL='${FUSIONAUTH_ADMIN_EMAIL}' && \
              export FUSIONAUTH_ADMIN_PASSWORD='${FUSIONAUTH_ADMIN_PASSWORD}' && \
              export FUSIONAUTH_API_KEY='${FUSIONAUTH_API_KEY}' && \
+             export FUSIONAUTH_API_KEY_ID='${FUSIONAUTH_API_KEY_ID}' && \
+             export FA_TENANT_ID='${FA_TENANT_ID}' && \
+             export FA_APP_ID_ADMIN='${FA_APP_ID_ADMIN}' && \
+             export FA_APP_ID_VENDOR='${FA_APP_ID_VENDOR}' && \
+             export FA_APP_ID_B2B='${FA_APP_ID_B2B}' && \
+             export FA_APP_ID_B2C='${FA_APP_ID_B2C}' && \
+             export FA_APP_ID_B2G='${FA_APP_ID_B2G}' && \
              export ADMIN_CLIENT_SECRET='${ADMIN_CLIENT_SECRET}' && \
              export VENDOR_CLIENT_SECRET='${VENDOR_CLIENT_SECRET}' && \
              export B2B_CLIENT_SECRET='${B2B_CLIENT_SECRET}' && \
@@ -89,6 +113,12 @@ jobs:
              export ADMIN_B2B_PASSWORD='${ADMIN_B2B_PASSWORD}' && \
              export ADMIN_B2G_PASSWORD='${ADMIN_B2G_PASSWORD}' && \
              export ADMIN_B2C_PASSWORD='${ADMIN_B2C_PASSWORD}' && \
+             export FA_SMTP_HOST='${FA_SMTP_HOST}' && \
+             export FA_SMTP_PORT='${FA_SMTP_PORT}' && \
+             export FA_SMTP_USER='${FA_SMTP_USER}' && \
+             export FA_SMTP_PASS='${FA_SMTP_PASS}' && \
+             export FA_SMTP_FROM_EMAIL='${FA_SMTP_FROM_EMAIL}' && \
+             export FA_SMTP_FROM_NAME='${FA_SMTP_FROM_NAME}' && \
              if [ '${{ github.event.inputs.rebuild }}' = 'true' ]; then \
                bash scripts/rebuild-vps.sh; \
              else \

@@ -19,6 +19,13 @@
 
     "apiKeyId": "#{ENV.FUSIONAUTH_API_KEY_ID}",
 
+    "smtpHost":      "#{ENV.FA_SMTP_HOST}",
+    "smtpPort":      587,
+    "smtpUser":      "#{ENV.FA_SMTP_USER}",
+    "smtpPass":      "#{ENV.FA_SMTP_PASS}",
+    "smtpFromEmail": "#{ENV.FA_SMTP_FROM_EMAIL}",
+    "smtpFromName":  "#{ENV.FA_SMTP_FROM_NAME}",
+
     "ADMIN_CLIENT_SECRET":  "#{ENV.ADMIN_CLIENT_SECRET}",
     "VENDOR_CLIENT_SECRET": "#{ENV.VENDOR_CLIENT_SECRET}",
     "B2B_CLIENT_SECRET":    "#{ENV.B2B_CLIENT_SECRET}",
@@ -81,6 +88,31 @@
   ],
 
   "requests": [
+
+    {
+      "method": "PUT",
+      "url": "/api/tenant/#{defaultTenantId}",
+      "body": {
+        "tenant": {
+          "emailConfiguration": {
+            "host": "#{smtpHost}",
+            "port": "#{smtpPort}",
+            "username": "#{smtpUser}",
+            "password": "#{smtpPass}",
+            "security": "TLS",
+            "defaultFromEmail": "#{smtpFromEmail}",
+            "defaultFromName": "#{smtpFromName}",
+            "verifyEmail": false,
+            "verifyEmailWhenChanged": false
+          },
+          "userDeletePolicy": {
+            "unverified": {
+              "enabled": false
+            }
+          }
+        }
+      }
+    },
 
     {
       "method": "POST",
