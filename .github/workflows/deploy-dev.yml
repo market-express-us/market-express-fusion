@@ -125,78 +125,6 @@ jobs:
                bash scripts/deploy-vps.sh; \
              fi"
 
-      # Kickstart applies ONLY to an empty FusionAuth database. On a running
-      # instance the kickstart.json SMTP block is ignored entirely, so changing
-      # FA_SMTP_* secrets and redeploying had no effect — the tenant kept
-      # whatever was configured at first boot. That drift is how a dead relay
-      # credential survived unnoticed and password resets stayed broken.
-      #
-      # This step reconciles the live tenant against the secrets on every
-      # deploy, making the secrets the actual source of truth.
-      - name: Reconcile FusionAuth email configuration
-        env:
-          FA_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
-          FA_TENANT_ID: ${{ secrets.FA_TENANT_ID }}
-          # ORG-level SMTP_* are canonical (mirrors the SMTP_* block in
-          # market-express-project/.env). FA_SMTP_* survive only for kickstart,
-          # which applies to a first boot against an empty database.
-          FA_SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          FA_SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          FA_SMTP_USER: ${{ secrets.SMTP_USERNAME }}
-          FA_SMTP_PASS: ${{ secrets.SMTP_PASSWORD }}
-          FA_SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
-          FA_SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
-          FA_SMTP_REPLY_TO: ${{ secrets.SMTP_REPLY_TO }}
-        run: |
-          set -euo pipefail
-          : "${FA_API_KEY:?FUSIONAUTH_API_KEY not set}"
-          : "${FA_TENANT_ID:?FA_TENANT_ID not set}"
-          : "${FA_SMTP_HOST:?FA_SMTP_HOST not set}"
-          : "${FA_SMTP_USER:?FA_SMTP_USER not set}"
-          : "${FA_SMTP_PASS:?FA_SMTP_PASS not set}"
-
-          # Most relays reject a From the authenticated mailbox does not own
-          # (Hostinger: 553 5.7.1). Fail here rather than at send time, when the
-          # only symptom is "password resets silently do not arrive".
-          if [ "$FA_SMTP_FROM_EMAIL" != "$FA_SMTP_USER" ]; then
-            echo "::warning::FA_SMTP_FROM_EMAIL ($FA_SMTP_FROM_EMAIL) differs from FA_SMTP_USER ($FA_SMTP_USER)."
-            echo "::warning::Relays commonly reject a sender not owned by the authenticated mailbox."
-          fi
-
-          PAYLOAD=$(jq -n \
-            --arg host "$FA_SMTP_HOST" --argjson port "${FA_SMTP_PORT:-587}" \
-            --arg user "$FA_SMTP_USER" --arg pass "$FA_SMTP_PASS" \
-            --arg from "$FA_SMTP_FROM_EMAIL" --arg name "$FA_SMTP_FROM_NAME" \
-            --arg reply "${FA_SMTP_REPLY_TO:-}" \
-            '{tenant:{emailConfiguration:{
-                host:$host, port:$port, security:"TLS",
-                username:$user, password:$pass,
-                defaultFromEmail:$from, defaultFromName:$name,
-                additionalHeaders: (if $reply == "" then []
-                                    else [{name:"Reply-To", value:$reply}] end)
-             }}}')
-
-          # Chrome UA: auth.marketexpress.us is behind Cloudflare, which blocks
-          # default HTTP-library agents from CI with 403 "error code: 1010" —
-          # indistinguishable from an auth failure.
-          HTTP=$(curl -s -o /tmp/fa_patch.json -w '%{http_code}' --max-time 30 \
-            -X PATCH "https://auth.marketexpress.us/api/tenant/${FA_TENANT_ID}" \
-            -H "Authorization: ${FA_API_KEY}" -H "Content-Type: application/json" \
-            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" \
-            --data "$PAYLOAD")
-
-          if [ "$HTTP" != "200" ]; then
-            echo "::error::Tenant email reconcile failed (HTTP $HTTP)"
-            head -c 400 /tmp/fa_patch.json
-            exit 1
-          fi
-          echo "Tenant email configuration reconciled:"
-          jq -r '.tenant.emailConfiguration
-                 | "  host: \(.host):\(.port) security=\(.security)",
-                   "  username: \(.username)",
-                   "  from: \(.defaultFromName) <\(.defaultFromEmail)>",
-                   "  additionalHeaders: \(.additionalHeaders)"' /tmp/fa_patch.json
-
       - name: Verify deployment
         run: |
           echo "Waiting 30 seconds for Traefik routing..."
@@ -208,3 +136,10 @@ jobs:
             echo "WARNING: Could not verify deployment (check manually)"
             exit 1
           fi
+
+  # Single source of reconcile logic — see .github/workflows/reconcile-smtp.yml
+  reconcile-smtp:
+    name: Reconcile FusionAuth SMTP
+    needs: deploy
+    uses: ./.github/workflows/reconcile-smtp.yml
+    secrets: inherit
