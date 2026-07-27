@@ -161,14 +161,17 @@ docker compose pull
 # still returned HTTP 200.
 echo "Clearing any stale renamed containers..."
 for svc in fusionauth-app fusionauth-db; do
-  # matches the <shorthash>_<name> form only, never the live container
-  docker ps -a --format '{{.Names}}' \
-    | grep -E "^[0-9a-f]{12}_${svc}$" \
-    | while read -r stale; do
-        echo "  removing stale container: ${stale}"
-        docker rm -f "${stale}" >/dev/null 2>&1 || true
-      done
+  # matches the <shorthash>_<name> form only, never the live container.
+  # `|| true` is required: grep exits 1 when nothing matches, and under
+  # `set -e` that aborts the deploy — which is the normal, healthy case.
+  stale_list=$(docker ps -a --format '{{.Names}}' \
+    | grep -E "^[0-9a-f]{12}_${svc}$" || true)
+  for stale in ${stale_list}; do
+    echo "  removing stale container: ${stale}"
+    docker rm -f "${stale}" >/dev/null 2>&1 || true
+  done
 done
+echo "  stale container sweep complete"
 
 # NOT zero-downtime: --force-recreate stops and replaces the container. The
 # gap is short but real, so the health check below is what makes the deploy
