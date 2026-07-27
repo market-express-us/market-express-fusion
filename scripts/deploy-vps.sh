@@ -195,7 +195,12 @@ fi
 # Wait for health checks
 echo "Waiting for FusionAuth to be healthy..."
 for i in {1..30}; do
-  if curl --fail --silent --insecure https://localhost:9011/api/status >/dev/null 2>&1; then
+  # FusionAuth serves plain HTTP on 9011 — TLS is terminated by Traefik, not
+  # by FusionAuth. The previous https:// probe could never succeed: verified on
+  # the host, https returns 000 while http returns 200. Every deploy therefore
+  # burned the full 30 x 10s health-check window and then failed, regardless of
+  # whether FusionAuth was actually healthy.
+  if curl --fail --silent http://localhost:9011/api/status >/dev/null 2>&1; then
     echo -e "${GREEN}✓ FusionAuth is healthy!${NC}"
     break
   fi
