@@ -78,6 +78,7 @@ jobs:
             NONE)         FA_SEC=NONE ;;
             *) echo "::error::Unknown SMTP_SECURITY '${SMTP_SECURITY}'"; exit 1 ;;
           esac
+          export FA_SEC
 
           # Relays reject a sender the authenticated mailbox does not own
           # (Hostinger: 553 5.7.1). The only symptom is silently undelivered
@@ -108,29 +109,45 @@ jobs:
             echo "  from:     ${CUR_FROM:-<empty>} -> ${SMTP_FROM_EMAIL}"
           fi
 
-          # Always PATCH: the password cannot be compared (FusionAuth returns it
-          # but a mismatch is exactly the failure we are guarding against), and
-          # PATCH is idempotent.
-          PAYLOAD=$(jq -n \
-            --arg host "$SMTP_HOST" --argjson port "${SMTP_PORT:-587}" \
-            --arg sec "$FA_SEC" --arg user "$SMTP_USERNAME" --arg pass "$SMTP_PASSWORD" \
-            --arg from "$SMTP_FROM_EMAIL" --arg name "$SMTP_FROM_NAME" \
-            --arg reply "${SMTP_REPLY_TO:-}" \
-            '{tenant:{emailConfiguration:{
-                host:$host, port:$port, security:$sec,
-                username:$user, password:$pass,
-                defaultFromEmail:$from, defaultFromName:$name,
-                additionalHeaders: (if $reply == "" then []
-                                    else [{name:"Reply-To", value:$reply}] end)
-             }}}')
+          # FusionAuth PATCH MERGES arrays — it does not replace them. Patching
+          # additionalHeaders appends, producing duplicate Reply-To entries
+          # (invalid per RFC 5322), and patching [] does not clear them.
+          # Therefore: GET the tenant, set the fields, PUT it back whole.
+          curl -sS --max-time 30 -A "$UA" -H "Authorization: ${FA_API_KEY}" \
+            "${FA_URL}/api/tenant/${FA_TENANT_ID}" -o /tmp/tenant.json
+
+          python3 - /tmp/tenant.json > /tmp/tenant_put.json <<'PYEOF'
+          import json, os, sys
+          d = json.load(open(sys.argv[1]))
+          ec = d["tenant"]["emailConfiguration"]
+          ec["host"] = os.environ["SMTP_HOST"]
+          ec["port"] = int(os.environ.get("SMTP_PORT") or 587)
+          ec["security"] = os.environ["FA_SEC"]
+          ec["username"] = os.environ["SMTP_USERNAME"]
+          ec["password"] = os.environ["SMTP_PASSWORD"]
+          ec["defaultFromEmail"] = os.environ["SMTP_FROM_EMAIL"]
+          ec["defaultFromName"] = os.environ["SMTP_FROM_NAME"]
+          reply = os.environ.get("SMTP_REPLY_TO", "")
+          others = [h for h in (ec.get("additionalHeaders") or [])
+                    if h.get("name", "").lower() != "reply-to"]
+          ec["additionalHeaders"] = others + ([{"name": "Reply-To", "value": reply}] if reply else [])
+          print(json.dumps({"tenant": d["tenant"]}))
+          PYEOF
 
           HTTP=$(curl -sS -o /tmp/after.json -w '%{http_code}' --max-time 30 -A "$UA" \
-            -X PATCH "${FA_URL}/api/tenant/${FA_TENANT_ID}" \
+            -X PUT "${FA_URL}/api/tenant/${FA_TENANT_ID}" \
             -H "Authorization: ${FA_API_KEY}" -H "Content-Type: application/json" \
-            --data "$PAYLOAD")
+            --data-binary @/tmp/tenant_put.json)
 
           if [ "$HTTP" != "200" ]; then
             echo "::error::Reconcile failed (HTTP $HTTP)"; head -c 400 /tmp/after.json; exit 1
+          fi
+
+          # Guard against ever shipping a duplicate Reply-To again
+          DUPES=$(jq '[.tenant.emailConfiguration.additionalHeaders[]?
+                       | select(.name | ascii_downcase == "reply-to")] | length' /tmp/after.json)
+          if [ "${DUPES:-0}" -gt 1 ]; then
+            echo "::error::${DUPES} Reply-To headers present — must be exactly one"; exit 1
           fi
 
           echo "== reconciled =="
