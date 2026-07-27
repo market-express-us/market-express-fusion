@@ -88,9 +88,31 @@ jobs:
             echo "::warning::Many relays reject this. Verify the provider permits it."
           fi
 
+          # Cloudflare fronts auth.marketexpress.us and its bot scoring is not
+          # deterministic — an identical request can succeed and then be blocked
+          # with 403 "error code: 1010" minutes later. The body is not JSON, so
+          # jq fails with a confusing "Invalid numeric literal" rather than
+          # anything pointing at the real cause. Retry, and validate the payload
+          # is JSON before using it.
+          fa_get () {
+            local out="$1" attempt=1 code
+            while [ $attempt -le 5 ]; do
+              code=$(curl -sS -o "$out" -w '%{http_code}' --max-time 30 -A "$UA" \
+                -H "Authorization: ${FA_API_KEY}" -H "Accept: application/json" \
+                "${FA_URL}/api/tenant/${FA_TENANT_ID}") || true
+              if [ "$code" = "200" ] && jq -e . "$out" >/dev/null 2>&1; then
+                return 0
+              fi
+              echo "  attempt ${attempt}: HTTP ${code} — $(head -c 80 "$out" | tr -d '\n')"
+              attempt=$((attempt+1)); sleep $((attempt*5))
+            done
+            echo "::error::Could not fetch tenant after 5 attempts (last HTTP ${code})."
+            echo "::error::If the body reads 'error code: 1010' this is a Cloudflare block, not auth."
+            return 1
+          }
+
           echo "== current tenant configuration =="
-          curl -sS --max-time 30 -A "$UA" -H "Authorization: ${FA_API_KEY}" \
-            "${FA_URL}/api/tenant/${FA_TENANT_ID}" -o /tmp/before.json
+          fa_get /tmp/before.json
           jq -r '.tenant.emailConfiguration
                  | "  host: \(.host):\(.port) security=\(.security)",
                    "  username: \(.username)",
