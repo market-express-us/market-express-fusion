@@ -178,9 +178,22 @@ echo "  stale container sweep complete"
 # trustworthy, not the flag.
 echo "Deploying FusionAuth..."
 if ! docker compose up -d --force-recreate --remove-orphans; then
-  echo "compose up failed — retrying once after clearing conflicts"
-  docker compose down --remove-orphans || true
-  docker compose up -d --remove-orphans
+  # Deliberately NO `docker compose down` fallback here. It was tried on
+  # 2026-07-27 and made things worse: to resolve an app-container name
+  # conflict it tore down fusionauth-db and the network as well, turning a
+  # recoverable app problem into a full stack outage.
+  #
+  # Fail loudly with the state needed to fix it by hand instead. The
+  # containers carry `restart: unless-stopped`, so the previous instance
+  # generally recovers on its own — a clean failure is safer than an
+  # automated teardown of the database.
+  echo "ERROR: compose up failed. Current state:"
+  docker compose ps || true
+  docker ps -a --filter name=fusionauth --format '  {{.Names}}\t{{.Status}}' || true
+  echo
+  echo "If a name conflict is reported above, remove the orphaned container:"
+  echo "  docker rm -f <container-id>   # then re-run the deploy"
+  exit 1
 fi
 
 # A failed recreate can leave the service stopped. Fail loudly rather than
