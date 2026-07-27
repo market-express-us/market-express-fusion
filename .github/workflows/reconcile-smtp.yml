@@ -1,0 +1,158 @@
+# =============================================================================
+# reconcile-smtp.yml — keep FusionAuth's SMTP config equal to the org secrets
+#
+# FusionAuth stores SMTP settings in ITS OWN DATABASE. It does not read .env,
+# and the FA_SMTP_* variables are not even passed into the container. The only
+# mechanisms that write that database are:
+#   - Kickstart  — first boot against an EMPTY database, then ignored forever
+#   - Admin UI   — manual
+#   - PATCH /api/tenant/{id}  — this workflow
+#
+# That gap is how a dead relay credential survived for months: .env, the
+# GitHub secrets and the VPS were all updated, while FusionAuth kept using
+# whatever it was handed at first boot. Password resets were broken platform
+# wide with no visible cause.
+#
+# GitHub emits no event when a secret changes, so this runs on a schedule as
+# well as on demand. The schedule also repairs drift from manual UI edits, a
+# database restore, or a kickstart re-run.
+#
+# Source of truth: ORG-level SMTP_* secrets, mirroring the SMTP_* block in
+# market-express-project/.env
+#
+# Author: Colin Bitterfield
+# Email: colin.bitterfield@marketexpress.us
+# Version: 1.0.0
+# =============================================================================
+name: Reconcile FusionAuth SMTP
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      send_test:
+        description: "Send a test email after reconciling"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    name: Reconcile tenant email configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FA_URL: https://auth.marketexpress.us
+      # auth.marketexpress.us is behind Cloudflare, which blocks default
+      # HTTP-library user agents from CI with 403 "error code: 1010" — a
+      # response indistinguishable from an authentication failure.
+      UA: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    steps:
+      - name: Reconcile
+        env:
+          FA_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
+          FA_TENANT_ID: ${{ secrets.FA_TENANT_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_SECURITY: ${{ secrets.SMTP_SECURITY }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
+          SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
+          SMTP_REPLY_TO: ${{ secrets.SMTP_REPLY_TO }}
+        run: |
+          set -euo pipefail
+          : "${FA_API_KEY:?FUSIONAUTH_API_KEY not set}"
+          : "${FA_TENANT_ID:?FA_TENANT_ID not set}"
+          : "${SMTP_HOST:?SMTP_HOST not set at org level}"
+          : "${SMTP_USERNAME:?SMTP_USERNAME not set at org level}"
+          : "${SMTP_PASSWORD:?SMTP_PASSWORD not set at org level}"
+
+          # FusionAuth calls STARTTLS "TLS" in its API
+          case "${SMTP_SECURITY:-STARTTLS}" in
+            STARTTLS|TLS) FA_SEC=TLS ;;
+            SSL)          FA_SEC=SSL ;;
+            NONE)         FA_SEC=NONE ;;
+            *) echo "::error::Unknown SMTP_SECURITY '${SMTP_SECURITY}'"; exit 1 ;;
+          esac
+
+          # Relays reject a sender the authenticated mailbox does not own
+          # (Hostinger: 553 5.7.1). The only symptom is silently undelivered
+          # password resets, so fail here instead.
+          if [ "${SMTP_FROM_EMAIL}" != "${SMTP_USERNAME}" ]; then
+            echo "::warning::SMTP_FROM_EMAIL (${SMTP_FROM_EMAIL}) != SMTP_USERNAME (${SMTP_USERNAME})"
+            echo "::warning::Many relays reject this. Verify the provider permits it."
+          fi
+
+          echo "== current tenant configuration =="
+          curl -sS --max-time 30 -A "$UA" -H "Authorization: ${FA_API_KEY}" \
+            "${FA_URL}/api/tenant/${FA_TENANT_ID}" -o /tmp/before.json
+          jq -r '.tenant.emailConfiguration
+                 | "  host: \(.host):\(.port) security=\(.security)",
+                   "  username: \(.username)",
+                   "  from: \(.defaultFromName) <\(.defaultFromEmail)>"' /tmp/before.json
+
+          CUR_HOST=$(jq -r '.tenant.emailConfiguration.host // ""' /tmp/before.json)
+          CUR_USER=$(jq -r '.tenant.emailConfiguration.username // ""' /tmp/before.json)
+          CUR_FROM=$(jq -r '.tenant.emailConfiguration.defaultFromEmail // ""' /tmp/before.json)
+
+          if [ "$CUR_HOST" = "$SMTP_HOST" ] && [ "$CUR_USER" = "$SMTP_USERNAME" ] && [ "$CUR_FROM" = "$SMTP_FROM_EMAIL" ]; then
+            echo "IN SYNC — no drift detected (password is always re-applied)"
+          else
+            echo "::notice::DRIFT DETECTED — reconciling to org secrets"
+            echo "  host:     ${CUR_HOST:-<empty>} -> ${SMTP_HOST}"
+            echo "  username: ${CUR_USER:-<empty>} -> ${SMTP_USERNAME}"
+            echo "  from:     ${CUR_FROM:-<empty>} -> ${SMTP_FROM_EMAIL}"
+          fi
+
+          # Always PATCH: the password cannot be compared (FusionAuth returns it
+          # but a mismatch is exactly the failure we are guarding against), and
+          # PATCH is idempotent.
+          PAYLOAD=$(jq -n \
+            --arg host "$SMTP_HOST" --argjson port "${SMTP_PORT:-587}" \
+            --arg sec "$FA_SEC" --arg user "$SMTP_USERNAME" --arg pass "$SMTP_PASSWORD" \
+            --arg from "$SMTP_FROM_EMAIL" --arg name "$SMTP_FROM_NAME" \
+            --arg reply "${SMTP_REPLY_TO:-}" \
+            '{tenant:{emailConfiguration:{
+                host:$host, port:$port, security:$sec,
+                username:$user, password:$pass,
+                defaultFromEmail:$from, defaultFromName:$name,
+                additionalHeaders: (if $reply == "" then []
+                                    else [{name:"Reply-To", value:$reply}] end)
+             }}}')
+
+          HTTP=$(curl -sS -o /tmp/after.json -w '%{http_code}' --max-time 30 -A "$UA" \
+            -X PATCH "${FA_URL}/api/tenant/${FA_TENANT_ID}" \
+            -H "Authorization: ${FA_API_KEY}" -H "Content-Type: application/json" \
+            --data "$PAYLOAD")
+
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::Reconcile failed (HTTP $HTTP)"; head -c 400 /tmp/after.json; exit 1
+          fi
+
+          echo "== reconciled =="
+          jq -r '.tenant.emailConfiguration
+                 | "  host: \(.host):\(.port) security=\(.security)",
+                   "  username: \(.username)",
+                   "  from: \(.defaultFromName) <\(.defaultFromEmail)>",
+                   "  additionalHeaders: \(.additionalHeaders)"' /tmp/after.json
+
+      - name: Send test email
+        if: inputs.send_test
+        env:
+          FA_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
+          TEST_TO: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          set -euo pipefail
+          : "${TEST_TO:?ALERT_EMAIL not set}"
+          # Proves the relay end to end, not just that the config was written.
+          HTTP=$(curl -sS -o /tmp/fp.json -w '%{http_code}' --max-time 30 -A "$UA" \
+            -X POST "${FA_URL}/api/user/forgot-password" \
+            -H "Authorization: ${FA_API_KEY}" -H "Content-Type: application/json" \
+            --data "$(jq -n --arg id "$TEST_TO" '{loginId:$id, sendForgotPasswordEmail:true}')")
+          echo "forgot-password -> HTTP $HTTP"
+          [ "$HTTP" = "200" ] || { head -c 300 /tmp/fp.json; exit 1; }
+          echo "Password-reset email dispatched to $TEST_TO"
