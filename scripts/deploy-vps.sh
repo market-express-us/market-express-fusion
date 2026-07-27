@@ -147,9 +147,47 @@ fi
 echo "Pulling Docker images..."
 docker compose pull
 
-# Deploy with zero-downtime restart
+# Clear stale renamed containers before recreating.
+#
+# `docker compose up --force-recreate` renames the running container to
+# <shorthash>_<name> before creating its replacement. If a previous run died
+# between those two steps, that renamed container survives and the next deploy
+# fails with:
+#   Error when allocating new name: Conflict. The container name
+#   "/fusionauth-app" is already in use by container "<id>"
+# Compose then removes the ORIGINAL container and aborts, leaving FusionAuth
+# down. That is what happened on 2026-07-27 — auth was offline until the stale
+# container was removed by hand, while Traefik served a maintenance page that
+# still returned HTTP 200.
+echo "Clearing any stale renamed containers..."
+for svc in fusionauth-app fusionauth-db; do
+  # matches the <shorthash>_<name> form only, never the live container
+  docker ps -a --format '{{.Names}}' \
+    | grep -E "^[0-9a-f]{12}_${svc}$" \
+    | while read -r stale; do
+        echo "  removing stale container: ${stale}"
+        docker rm -f "${stale}" >/dev/null 2>&1 || true
+      done
+done
+
+# NOT zero-downtime: --force-recreate stops and replaces the container. The
+# gap is short but real, so the health check below is what makes the deploy
+# trustworthy, not the flag.
 echo "Deploying FusionAuth..."
-docker compose up -d --force-recreate
+if ! docker compose up -d --force-recreate --remove-orphans; then
+  echo "compose up failed — retrying once after clearing conflicts"
+  docker compose down --remove-orphans || true
+  docker compose up -d --remove-orphans
+fi
+
+# A failed recreate can leave the service stopped. Fail loudly rather than
+# proceeding to a health check that will time out with no explanation.
+if ! docker compose ps --status running --services | grep -q fusionauth; then
+  echo "ERROR: fusionauth container is not running after deploy"
+  docker compose ps
+  docker compose logs --tail=50 fusionauth || true
+  exit 1
+fi
 
 # Wait for health checks
 echo "Waiting for FusionAuth to be healthy..."
