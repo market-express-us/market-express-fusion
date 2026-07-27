@@ -137,13 +137,16 @@ jobs:
         env:
           FA_API_KEY: ${{ secrets.FUSIONAUTH_API_KEY }}
           FA_TENANT_ID: ${{ secrets.FA_TENANT_ID }}
-          FA_SMTP_HOST: ${{ secrets.FA_SMTP_HOST }}
-          FA_SMTP_PORT: ${{ secrets.FA_SMTP_PORT }}
-          FA_SMTP_USER: ${{ secrets.FA_SMTP_USER }}
-          FA_SMTP_PASS: ${{ secrets.FA_SMTP_PASS }}
-          FA_SMTP_FROM_EMAIL: ${{ secrets.FA_SMTP_FROM_EMAIL }}
-          FA_SMTP_FROM_NAME: ${{ secrets.FA_SMTP_FROM_NAME }}
-          FA_SMTP_REPLY_TO: ${{ secrets.FA_SMTP_REPLY_TO }}
+          # ORG-level SMTP_* are canonical (mirrors the SMTP_* block in
+          # market-express-project/.env). FA_SMTP_* survive only for kickstart,
+          # which applies to a first boot against an empty database.
+          FA_SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          FA_SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          FA_SMTP_USER: ${{ secrets.SMTP_USERNAME }}
+          FA_SMTP_PASS: ${{ secrets.SMTP_PASSWORD }}
+          FA_SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
+          FA_SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
+          FA_SMTP_REPLY_TO: ${{ secrets.SMTP_REPLY_TO }}
         run: |
           set -euo pipefail
           : "${FA_API_KEY:?FUSIONAUTH_API_KEY not set}"
