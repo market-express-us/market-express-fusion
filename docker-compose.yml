@@ -126,8 +126,14 @@ services:
 
     ports:
       # FusionAuth admin UI and API
-      - "9011:9011"
-
+      # Bound to loopback. Traefik reaches FusionAuth over the
+      # market-express-proxy docker network, not this published port —
+      # verified: traefik -> http://fusionauth-app:9011/api/status OK.
+      # The only consumer of the HOST port is the deploy health check,
+      # which uses http://localhost:9011 and is unaffected.
+      # Published on 0.0.0.0 it exposed the FusionAuth admin UI and API
+      # directly, bypassing Cloudflare\'s WAF entirely (#142).
+      - "127.0.0.1:9011:9011"
     volumes:
       # Kickstart configuration (read-only mount)
       - ./kickstart.json:/usr/local/fusionauth/kickstart/kickstart.json:ro
