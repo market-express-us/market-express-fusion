@@ -16,9 +16,20 @@
 name: Deploy to VPS Dev
 
 on:
-  push:
-    branches:
-      - master
+  # ⛔ AUTOMATIC DEPLOY DISABLED — 2026-08-29.
+  #
+  # This deployed FusionAuth to 15.204.91.25 on every push to master. That host
+  # has served no traffic since the 2026-08-27 cutover; FusionAuth runs on the
+  # k3s cluster as me-prod/fusionauth against a restored database.
+  #
+  # It was still firing: a run at 2026-08-29T14:09 restarted the stale
+  # fusionauth-app and fusionauth-db containers on the retired host and reported
+  # SUCCESS. Nothing reaches them.
+  #
+  # Kept dispatchable so a fresh instance can still be stood up — but read the
+  # KICKSTART-DRIFT section in README.md first: kickstart.json declares 2
+  # applications with placeholder UUIDs while the live instance has 8 with real
+  # ones, so it cannot reproduce production.
   workflow_dispatch:
     inputs:
       rebuild:
@@ -32,7 +43,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to 15.204.91.25
+    name: Deploy to ${{ secrets.VPS_HOST }}
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +55,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_market-express-fusion
           chmod 600 ~/.ssh/id_market-express-fusion
-          ssh-keyscan -H 15.204.91.25 >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
         env:
@@ -80,7 +91,7 @@ jobs:
           FA_SMTP_FROM_EMAIL: ${{ secrets.FA_SMTP_FROM_EMAIL }}
           FA_SMTP_FROM_NAME: ${{ secrets.FA_SMTP_FROM_NAME }}
         run: |
-          ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 "mkdir -p ~/fusionauth"
+          ssh -i ~/.ssh/id_market-express-fusion fusion-auth@${{ secrets.VPS_HOST }} "mkdir -p ~/fusionauth"
 
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_market-express-fusion" \
@@ -88,9 +99,9 @@ jobs:
             --exclude='.git' \
             --exclude='*.backup.*' \
             --exclude='backup*.sql' \
-            ./ fusion-auth@15.204.91.25:~/fusionauth/
+            ./ fusion-auth@${{ secrets.VPS_HOST }}:~/fusionauth/
 
-          ssh -i ~/.ssh/id_market-express-fusion fusion-auth@15.204.91.25 \
+          ssh -i ~/.ssh/id_market-express-fusion fusion-auth@${{ secrets.VPS_HOST }} \
             "cd ~/fusionauth && \
              export DATABASE_PASSWORD='${DATABASE_PASSWORD}' && \
              export FUSIONAUTH_ADMIN_EMAIL='${FUSIONAUTH_ADMIN_EMAIL}' && \
