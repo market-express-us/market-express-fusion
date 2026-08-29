@@ -665,3 +665,44 @@ Copyright (c) 2026 Nevada Associates LLC
 **Version:** 1.0.0
 **Last Updated:** 2026-01-20
 **Maintainer:** Colin Bitterfield (colin@bitterfield.com)
+
+---
+
+## ⚠️ FusionAuth runs on Kubernetes — this repo no longer deploys it
+
+Since **2026-08-27** FusionAuth serves `auth.marketexpress.us` from the k3s
+cluster as a Kubernetes Deployment (`me-prod/fusionauth`), against a database
+restored from production.
+
+| Artefact | Status |
+|---|---|
+| `docker-compose.yml` | **not used.** The manifest is `market-express-infra/k8s/me-prod/fusionauth.yaml` |
+| `kickstart.json` | fresh-instance provisioning only — **see the drift warning below** |
+| `.github/workflows/deploy-fusionauth.yml` | `workflow_dispatch` only; it targets the retired Compose host |
+
+### KICKSTART-DRIFT — this file cannot reproduce production
+
+`kickstart.json` declares **2** applications (`marketexpress-admin`,
+`marketexpress-vendor`) using placeholder UUIDs (`11000001-…`).
+
+The live instance has **8** applications with entirely different, real IDs:
+
+```
+marketexpress-admin     84bfa7c6-cfaa-4194-82a9-3ed6b429f553
+marketexpress-vendor    bc02396a-3248-457b-b6e4-1f98a87437bd
+marketexpress-b2b       957df4f1-d9f1-4226-bc0a-716a6a52ed40
+marketexpress-b2c       f20409c5-fd20-4dea-b7d3-4d4f7405877b
+marketexpress-b2g       3aa98aa5-5a56-411d-a40f-722dfea33164
+marketexpress-employee  7ed0c97a-…      marketexpress-store  9fb71511-…
+```
+
+Kickstart is skipped against a populated database, so it has never re-run since
+the applications were created through the API. **Restoring from this file would
+produce a two-application instance with IDs that match nothing** — every
+storefront, the admin panel and the vendor portal reference the live IDs.
+
+**Disaster recovery for FusionAuth is the database dump, not this file.**
+`me-backup-k8s` takes one nightly (89 tables) and verifies its content.
+
+Tracked separately. Do not treat `kickstart.json` as a source of truth until it
+is regenerated from the live instance.
