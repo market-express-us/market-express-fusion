@@ -28,9 +28,9 @@ This project supports 4 deployment environments with environment-specific config
 | Environment | Infrastructure | Domain | Deployment Method | Status |
 |------------|---------------|--------|-------------------|--------|
 | **Sandbox** | Local workstation | localhost:9011 | `make env-sandbox && make init` | ✅ Active |
-| **Dev** | VPS 15.204.91.25 | auth-dev.marketexpress.us | `git push origin main` (GitHub Actions) | ✅ Active |
+| **Dev (retired)** | VPS 15.204.91.25 | — | ⛔ decommissioned | ❌ Gone |
 | **Stage** | OCI Kubernetes | auth-stage.marketexpress.us | `make env-stage RELEASE=v1.2.3` | 🔜 Phase 4 |
-| **Prod** | OCI Kubernetes | auth.marketexpress.us | `make env-prod RELEASE=v1.2.3` | 🔜 Phase 4 |
+| **Prod** | **k3s** (40.160.135.114) | **auth.marketexpress.us** | `kubectl` — manifest in `market-express-infra/k8s/me-prod/fusionauth.yaml` | ✅ **LIVE** |
 
 ### Sandbox Deployment (Local)
 
@@ -63,21 +63,36 @@ open http://localhost:9011
 
 **Purpose:** Team development and integration testing
 
-**Prerequisites:**
-- GitHub Secrets configured (see below)
-- Traefik proxy running on VPS with `market-express-proxy` network
-- DNS: `auth-dev.marketexpress.us` → 15.204.91.25
-- SSH access: `fusion-auth@15.204.91.25` with key `id_market-express-fusion`
+> ⛔ **This section describes a host that no longer serves anything.**
+>
+> FusionAuth moved to the k3s cluster on **2026-08-27**. `git push` no longer
+> deploys it — the push trigger was removed on 2026-08-29, because it was still
+> firing and restarting stale containers on the retired host while reporting
+> success.
+>
+> **Production now:**
+>
+> | | |
+> |---|---|
+> | Runs as | `me-prod/fusionauth` Deployment on k3s |
+> | Manifest | `market-express-infra/k8s/me-prod/fusionauth.yaml` |
+> | Database | `me-data/postgres-fusionauth-0`, TLS on |
+> | Serves | `auth.marketexpress.us` |
+> | Backups | `me-backup-k8s` nightly, 89 tables, content-verified |
+>
+> **To change the running version:** edit the manifest and `kubectl apply`.
+> **To change FusionAuth configuration:** use the FusionAuth API or admin UI
+> against the live instance. Kickstart does not apply — see KICKSTART-DRIFT
+> below.
 
-**Deployment:**
+The historical Compose deployment is retained below for reference only:
+
 ```bash
-# Automatic deployment via GitHub Actions
-git add .
-git commit -m "feat: update FusionAuth configuration"
-git push origin main
-
-# GitHub Actions will:
-# 1. SSH to fusion-auth@15.204.91.25
+# ⛔ HISTORICAL — targets the retired host. Kept so the old procedure is
+#    recoverable if a fresh Compose instance is ever needed.
+#
+# GitHub Actions used to:
+# 1. SSH to fusion-auth@$VPS_HOST
 # 2. Create .env from GitHub Secrets
 # 3. Deploy with docker-compose
 # 4. Verify health checks
