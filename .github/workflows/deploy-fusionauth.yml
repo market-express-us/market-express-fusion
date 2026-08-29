@@ -8,9 +8,29 @@
 
 name: Deploy FusionAuth
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ⛔ AUTOMATIC DEPLOY DISABLED — 2026-08-29
+# ─────────────────────────────────────────────────────────────────────────────
+# FusionAuth moved to the k3s cluster on 2026-08-27. It runs there as a
+# Kubernetes Deployment (me-prod/fusionauth) against a restored database, and
+# serves auth.marketexpress.us.
+#
+# This workflow scp'd docker-compose.yml and kickstart.json to the COMPOSE host
+# and ran `docker compose up -d`. Neither half applies any more:
+#
+#   docker-compose.yml  — not how FusionAuth runs. The manifest lives in
+#                         market-express-infra/k8s/me-prod/fusionauth.yaml
+#   kickstart.json      — provisions an EMPTY instance. The live database has
+#                         8 applications and 21 users. Kickstart is skipped
+#                         against a populated database, so pushing it achieved
+#                         nothing even before the migration — which is exactly
+#                         why the live application IDs do not match this file.
+#
+# Left as workflow_dispatch rather than deleted: it is the only automated path
+# to stand up a fresh FusionAuth, which matters for disaster recovery and for a
+# scratch environment. See KICKSTART-DRIFT below before trusting it for either.
+
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
     inputs:
       rebuild:
