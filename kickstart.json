@@ -204,9 +204,9 @@
           },
           "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 1800, "refreshTokenTimeToLiveInMinutes": 10080 },
           "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
-          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "registrationConfiguration": { "enabled": false, "type": "basic" },
           "selfServiceRegistrationConfiguration": {
-            "enabled": true,
+            "enabled": false,
             "confirmPassword": true,
             "loginIdType": "email",
             "registrationFields": [
@@ -259,9 +259,9 @@
           },
           "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 1800, "refreshTokenTimeToLiveInMinutes": 10080 },
           "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
-          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "registrationConfiguration": { "enabled": false, "type": "basic" },
           "selfServiceRegistrationConfiguration": {
-            "enabled": true,
+            "enabled": false,
             "confirmPassword": true,
             "loginIdType": "email",
             "registrationFields": [
@@ -313,9 +313,9 @@
           },
           "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 1800, "refreshTokenTimeToLiveInMinutes": 10080 },
           "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
-          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "registrationConfiguration": { "enabled": false, "type": "basic" },
           "selfServiceRegistrationConfiguration": {
-            "enabled": true,
+            "enabled": false,
             "confirmPassword": true,
             "loginIdType": "email",
             "registrationFields": [
@@ -366,9 +366,9 @@
           },
           "jwtConfiguration": { "enabled": true, "timeToLiveInSeconds": 1800, "refreshTokenTimeToLiveInMinutes": 10080 },
           "loginConfiguration": { "requireAuthentication": true, "allowTokenRefresh": true },
-          "registrationConfiguration": { "enabled": true, "type": "basic" },
+          "registrationConfiguration": { "enabled": false, "type": "basic" },
           "selfServiceRegistrationConfiguration": {
-            "enabled": true,
+            "enabled": false,
             "confirmPassword": true,
             "loginIdType": "email",
             "registrationFields": [
