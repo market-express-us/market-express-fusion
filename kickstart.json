@@ -20,7 +20,8 @@
     "apiKeyId": "#{ENV.FUSIONAUTH_API_KEY_ID}",
 
     "smtpHost":      "#{ENV.FA_SMTP_HOST}",
-    "smtpPort":      587,
+    "smtpPort":      "#{ENV.FA_SMTP_PORT}",
+    "smtpSecurity":  "#{ENV.FA_SMTP_SECURITY}",
     "smtpUser":      "#{ENV.FA_SMTP_USER}",
     "smtpPass":      "#{ENV.FA_SMTP_PASS}",
     "smtpFromEmail": "#{ENV.FA_SMTP_FROM_EMAIL}",
@@ -33,7 +34,12 @@
     "B2G_CLIENT_SECRET":    "#{ENV.B2G_CLIENT_SECRET}",
 
     "FUSIONAUTH_API_KEY":        "#{ENV.FUSIONAUTH_API_KEY}",
-    "FUSIONAUTH_ADMIN_EMAIL":    "admin@marketexpress.us",
+    "FUSIONAUTH_ADMIN_EMAIL":    "#{ENV.FA_ADMIN_EMAIL}",
+    "adminFusionEmail":          "#{ENV.FA_ADMIN_FUSION_EMAIL}",
+    "adminEmployeeEmail":        "#{ENV.FA_ADMIN_EMPLOYEE_EMAIL}",
+    "adminB2bEmail":             "#{ENV.FA_ADMIN_B2B_EMAIL}",
+    "adminB2gEmail":             "#{ENV.FA_ADMIN_B2G_EMAIL}",
+    "adminB2cEmail":             "#{ENV.FA_ADMIN_B2C_EMAIL}",
     "FUSIONAUTH_ADMIN_PASSWORD": "#{ENV.FUSIONAUTH_ADMIN_PASSWORD}",
 
     "platformAdminUserId": "00000000-0000-0000-0000-000000000001",
@@ -73,7 +79,9 @@
       "description": "MarketExpress platform integration API key",
       "permissions": {
         "endpoints": {
+          "/api/tenant":            ["GET","POST","PUT","PATCH","DELETE"],
           "/api/application":       ["GET","POST","PUT","PATCH","DELETE"],
+          "/api/user/search":       ["GET","POST"],
           "/api/user":              ["GET","POST","PUT","PATCH","DELETE"],
           "/api/user/registration": ["GET","POST","PUT","PATCH","DELETE"],
           "/api/group":             ["GET","POST","PUT","PATCH","DELETE"],
@@ -90,7 +98,7 @@
   "requests": [
 
     {
-      "method": "PUT",
+      "method": "PATCH",
       "url": "/api/tenant/#{defaultTenantId}",
       "body": {
         "tenant": {
@@ -99,7 +107,7 @@
             "port": "#{smtpPort}",
             "username": "#{smtpUser}",
             "password": "#{smtpPass}",
-            "security": "TLS",
+            "security": "#{smtpSecurity}",
             "defaultFromEmail": "#{smtpFromEmail}",
             "defaultFromName": "#{smtpFromName}",
             "verifyEmail": false,
@@ -379,25 +387,25 @@
       }
     },
 
-    { "method": "POST", "url": "/api/group/#{groupAdminOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminOwnerId}",    "name": "admin-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupAdminManagerId}",  "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminManagerId}",  "name": "admin-manager",  "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupAdminEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminEmployeeId}", "name": "admin-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupAdminOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminOwnerId}",    "name": "admin-owner",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupAdminManagerId}",  "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminManagerId}",  "name": "admin-manager",  "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupAdminEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupAdminEmployeeId}", "name": "admin-employee", "tenantId": "#{defaultTenantId}" } } },
 
-    { "method": "POST", "url": "/api/group/#{groupVendorOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorOwnerId}",    "name": "vendor-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupVendorAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorAdminId}",    "name": "vendor-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupVendorEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorEmployeeId}", "name": "vendor-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupVendorOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorOwnerId}",    "name": "vendor-owner",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupVendorAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorAdminId}",    "name": "vendor-admin",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupVendorEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupVendorEmployeeId}", "name": "vendor-employee", "tenantId": "#{defaultTenantId}" } } },
 
-    { "method": "POST", "url": "/api/group/#{groupB2bOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bOwnerId}",    "name": "b2b-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupB2bAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bAdminId}",    "name": "b2b-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupB2bEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bEmployeeId}", "name": "b2b-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2bOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bOwnerId}",    "name": "b2b-owner",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupB2bAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bAdminId}",    "name": "b2b-admin",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupB2bEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2bEmployeeId}", "name": "b2b-employee", "tenantId": "#{defaultTenantId}" } } },
 
-    { "method": "POST", "url": "/api/group/#{groupB2gOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gOwnerId}",    "name": "b2g-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupB2gAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gAdminId}",    "name": "b2g-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupB2gEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gEmployeeId}", "name": "b2g-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2gOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gOwnerId}",    "name": "b2g-owner",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupB2gAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gAdminId}",    "name": "b2g-admin",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupB2gEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2gEmployeeId}", "name": "b2g-employee", "tenantId": "#{defaultTenantId}" } } },
 
-    { "method": "POST", "url": "/api/group/#{groupB2cOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cOwnerId}",    "name": "b2c-owner",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupB2cAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cAdminId}",    "name": "b2c-admin",    "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
-    { "method": "POST", "url": "/api/group/#{groupB2cEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cEmployeeId}", "name": "b2c-employee", "tenantId": "#{defaultTenantId}" }, "roleIds": [] } },
+    { "method": "POST", "url": "/api/group/#{groupB2cOwnerId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cOwnerId}",    "name": "b2c-owner",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupB2cAdminId}",    "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cAdminId}",    "name": "b2c-admin",    "tenantId": "#{defaultTenantId}" } } },
+    { "method": "POST", "url": "/api/group/#{groupB2cEmployeeId}", "tenantId": "#{defaultTenantId}", "body": { "group": { "id": "#{groupB2cEmployeeId}", "name": "b2c-employee", "tenantId": "#{defaultTenantId}" } } },
 
     {
       "method": "POST",
@@ -421,7 +429,7 @@
       "body": {
         "user": {
           "id": "#{adminFusionUserId}",
-          "email": "admin.fusion@marketexpress.us",
+          "email": "#{adminFusionEmail}",
           "password": "#{adminFusionPassword}",
           "firstName": "FusionAuth", "lastName": "Admin",
           "tenantId": "#{defaultTenantId}", "active": true, "verified": true
@@ -437,7 +445,7 @@
       "body": {
         "user": {
           "id": "#{adminEmployeeUserId}",
-          "email": "admin.employee@marketexpress.us",
+          "email": "#{adminEmployeeEmail}",
           "password": "#{adminEmployeePassword}",
           "firstName": "Admin", "lastName": "Employee",
           "tenantId": "#{defaultTenantId}", "active": true, "verified": true
@@ -453,7 +461,7 @@
       "body": {
         "user": {
           "id": "#{adminB2bUserId}",
-          "email": "admin.b2b@marketexpress.us",
+          "email": "#{adminB2bEmail}",
           "password": "#{adminB2bPassword}",
           "firstName": "B2B", "lastName": "Admin",
           "tenantId": "#{defaultTenantId}", "active": true, "verified": true
@@ -469,7 +477,7 @@
       "body": {
         "user": {
           "id": "#{adminB2gUserId}",
-          "email": "admin.b2g@marketexpress.us",
+          "email": "#{adminB2gEmail}",
           "password": "#{adminB2gPassword}",
           "firstName": "B2G", "lastName": "Admin",
           "tenantId": "#{defaultTenantId}", "active": true, "verified": true
@@ -485,7 +493,7 @@
       "body": {
         "user": {
           "id": "#{adminB2cUserId}",
-          "email": "admin.b2c@marketexpress.us",
+          "email": "#{adminB2cEmail}",
           "password": "#{adminB2cPassword}",
           "firstName": "B2C", "lastName": "Admin",
           "tenantId": "#{defaultTenantId}", "active": true, "verified": true
