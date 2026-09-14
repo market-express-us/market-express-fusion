@@ -8,14 +8,14 @@
     "b2cApplicationId":    "#{ENV.FA_APP_ID_B2C}",
     "b2gApplicationId":    "#{ENV.FA_APP_ID_B2G}",
 
-    "fusionAuthBaseURL":   "https://auth.marketexpress.us",
-    "backendURL":          "https://api.marketexpress.us",
-    "adminPanelURL":       "https://admin.marketexpress.us",
-    "vendorPortalURL":     "https://vendors.marketexpress.us",
-    "b2bStorefrontURL":    "https://business.marketexpress.us",
-    "b2cStorefrontURL":    "https://buyersclub.marketexpress.us",
-    "b2gStorefrontURL":    "https://government.marketexpress.us",
-    "wwwStorefrontURL":    "https://www.marketexpress.us",
+    "fusionAuthBaseURL":   "#{ENV.FA_BASE_URL}",
+    "backendURL":          "#{ENV.FA_BACKEND_URL}",
+    "adminPanelURL":       "#{ENV.FA_ADMIN_URL}",
+    "vendorPortalURL":     "#{ENV.FA_VENDOR_URL}",
+    "b2bStorefrontURL":    "#{ENV.FA_B2B_URL}",
+    "b2cStorefrontURL":    "#{ENV.FA_B2C_URL}",
+    "b2gStorefrontURL":    "#{ENV.FA_B2G_URL}",
+    "wwwStorefrontURL":    "#{ENV.FA_WWW_URL}",
 
     "apiKeyId": "#{ENV.FUSIONAUTH_API_KEY_ID}",
 
