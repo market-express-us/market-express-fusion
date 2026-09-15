@@ -29,10 +29,16 @@ name: Reconcile FusionAuth SMTP
 on:
   schedule:
     - cron: "0 */6 * * *"
-  # Callable from deploy-dev.yml so the reconcile logic exists in exactly ONE
-  # place. It was previously duplicated inline in the deploy, and that copy
-  # still used PATCH — which merges arrays — appending a Reply-To header on
-  # every deploy until four were present.
+  # ⚠️ Its former caller, deploy-dev.yml, was DELETED on 2026-09-15 along with
+  # deploy-fusionauth.yml — both rsynced to a `secrets.VPS_HOST` that exists in
+  # no scope, and neither deployed production (that runs from
+  # market-express-infra/k8s/me-prod/fusionauth.yaml).
+  #
+  # THIS WORKFLOW IS NOT ORPHANED BY THAT. It has its own schedule above and runs
+  # every 6 hours regardless of any caller. `workflow_call` is kept so a future
+  # deploy can reuse it rather than re-inlining the logic — which is what caused
+  # the bug worth remembering: the old inline copy used PATCH, which MERGES
+  # arrays, appending a Reply-To header on every deploy until four were present.
   workflow_call:
   workflow_dispatch:
     inputs:

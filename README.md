@@ -693,7 +693,9 @@ restored from production.
 |---|---|
 | `docker-compose.yml` | **not used.** The manifest is `market-express-infra/k8s/me-prod/fusionauth.yaml` |
 | `kickstart.json` | fresh-instance provisioning only — **see the drift warning below** |
-| `.github/workflows/deploy-fusionauth.yml` | `workflow_dispatch` only; it targets the retired Compose host |
+| `.github/workflows/deploy-fusionauth.yml` | **DELETED 2026-09-15** — it targeted the retired Compose host via a `secrets.VPS_HOST` that exists in no scope, and failed every run |
+| `.github/workflows/deploy-dev.yml` | **DELETED 2026-09-15** — same: rsynced to an empty `VPS_HOST`, carried a destructive `rebuild` input, and verified against production's `auth.marketexpress.us`, so a deploy aimed at nothing would have validated against production and reported success |
+| `.github/workflows/reconcile-smtp.yml` | **kept** — runs on its own 6-hourly schedule, not orphaned by the deletions above |
 
 ### KICKSTART-DRIFT — this file cannot reproduce production
 
