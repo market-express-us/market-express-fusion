@@ -102,6 +102,8 @@
       "url": "/api/tenant/#{defaultTenantId}",
       "body": {
         "tenant": {
+          "_comment_issuer": "infra#260. FusionAuth seeds the default tenant's issuer as the placeholder 'acme.com'. Kickstart never set it, so dev served iss=acme.com while production (set by hand) served its real URL. From 1.69.x the issuer is also emitted as `iss` in the authorization response (RFC 9207), so it reaches storefront callbacks. DERIVED, never hardcoded: dev is marketexpres.us (ONE s), production marketexpress.us (TWO s), and both resolve - a literal here would silently repoint an environment.",
+          "issuer": "#{fusionAuthBaseURL}",
           "emailConfiguration": {
             "host": "#{smtpHost}",
             "port": "#{smtpPort}",
